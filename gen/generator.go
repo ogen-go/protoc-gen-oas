@@ -1,16 +1,16 @@
 package gen
 
 import (
-	"google.golang.org/protobuf/types/pluginpb"
+	"google.golang.org/protobuf/compiler/protogen"
 
 	"github.com/ogen-go/ogen"
 )
 
 // NewGenerator returns new Generator instance.
-func NewGenerator(req *pluginpb.CodeGeneratorRequest, opts ...GeneratorOption) (*Generator, error) {
+func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := Generator{
-		req:  req,
-		spec: ogen.NewSpec(),
+		protoFiles: protoFiles,
+		spec:       ogen.NewSpec(),
 	}
 
 	for _, opt := range opts {
@@ -22,6 +22,6 @@ func NewGenerator(req *pluginpb.CodeGeneratorRequest, opts ...GeneratorOption) (
 
 // Generator instance.
 type Generator struct {
-	req  *pluginpb.CodeGeneratorRequest
-	spec *ogen.Spec
+	protoFiles []*protogen.File
+	spec       *ogen.Spec
 }
