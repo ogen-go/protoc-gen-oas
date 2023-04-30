@@ -30,7 +30,7 @@ func run() error {
 
 	p := func(plugin *protogen.Plugin) error {
 		_, _ = gen.NewGenerator(
-			plugin.Request,
+			plugin.Files,
 			gen.WithSpecOpenAPI(*openapi),
 			gen.WithSpecInfoTitle(*title),
 			gen.WithSpecInfoDescription(*description),
