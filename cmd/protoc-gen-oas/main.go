@@ -1,32 +1,48 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"fmt"
-	"io"
 	"os"
 
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/pluginpb"
+	"google.golang.org/protobuf/compiler/protogen"
 
 	"github.com/go-faster/errors"
+
+	"github.com/ogen-go/protoc-gen-oas/gen"
 )
 
 func run() error {
-	r := bufio.NewReader(os.Stdin)
+	set := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	input, err := io.ReadAll(r)
-	if err != nil {
-		return errors.Wrap(err, "read stdin")
+	openapi := set.String("openapi", "3.0.0", "OpenAPI version")
+	title := set.String("title", "", "Title")
+	description := set.String("description", "", "Description")
+	version := set.String("version", "", "Version")
+
+	if err := set.Parse(os.Args[1:]); err != nil {
+		return errors.Wrap(err, "parse args")
 	}
 
-	req := new(pluginpb.CodeGeneratorRequest)
-
-	if err := proto.Unmarshal(input, req); err != nil {
-		return errors.Wrap(err, "unmarshal code generator request")
+	opts := protogen.Options{
+		ParamFunc: set.Set,
 	}
 
-	// TODO(sashamelentyev): add stdout or file writer.
+	p := func(plugin *protogen.Plugin) error {
+		_, _ = gen.NewGenerator(
+			plugin.Request,
+			gen.WithSpecOpenAPI(*openapi),
+			gen.WithSpecInfoTitle(*title),
+			gen.WithSpecInfoDescription(*description),
+			gen.WithSpecInfoVersion(*version),
+		)
+
+		// TODO(sashamelentyev): add stdout or file writer.
+
+		return nil
+	}
+
+	opts.Run(p)
 
 	return nil
 }
