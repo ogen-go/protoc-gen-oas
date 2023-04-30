@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/go-faster/errors v0.6.1
 	github.com/ogen-go/ogen v0.66.0
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.30.0
 )
 
