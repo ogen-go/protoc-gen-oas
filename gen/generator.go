@@ -12,6 +12,8 @@ import (
 
 	"github.com/go-faster/yaml"
 	"github.com/ogen-go/ogen"
+
+	"github.com/ogen-go/protoc-gen-oas/internal/naming"
 )
 
 // NewGenerator returns new Generator instance.
@@ -88,8 +90,9 @@ func (g *Generator) mkGetOp(path string, method *protogen.Method) {
 	parameter := string(method.Input.Desc.Name())
 	g.parameters[parameter] = struct{}{}
 
-	opID := string(method.Desc.Name())
-	ref := g.respRef(method.Output.Desc.Name())
+	opID := g.mkOpID(method.Desc)
+	name := string(method.Output.Desc.Name())
+	ref := g.respRef(name)
 	op := ogen.NewOperation().
 		SetOperationID(opID).
 		SetResponses(ogen.Responses{
@@ -98,8 +101,14 @@ func (g *Generator) mkGetOp(path string, method *protogen.Method) {
 	g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
 }
 
-func (g *Generator) respRef(name any) string {
-	return fmt.Sprintf("#/components/responses/%s", name)
+func (g *Generator) mkOpID(methodDescriptor protoreflect.MethodDescriptor) string {
+	name := string(methodDescriptor.Name())
+	return naming.LowerCamelCase(name)
+}
+
+func (g *Generator) respRef(s string) string {
+	resp := naming.LastAfterDots(s)
+	return fmt.Sprintf("#/components/responses/%s", resp)
 }
 
 func (g *Generator) mkComponents() {
@@ -131,30 +140,47 @@ func (g *Generator) mkResponse(message *protogen.Message) {
 }
 
 func (g *Generator) mkProperty(fieldDescriptor protoreflect.FieldDescriptor) ogen.Property {
-	name := string(fieldDescriptor.Name())
-	s := ogen.NewSchema()
-	typ := fieldDescriptor.Kind().String()
-	if fieldDescriptor.Message() != nil {
-		typ = string(fieldDescriptor.Message().FullName())
-	}
-
-	if fieldDescriptor.Cardinality() == protoreflect.Repeated {
-		splittedType := strings.Split(typ, ".")
-		schemaName := splittedType[len(splittedType)-1]
-		ref := g.respRef(schemaName)
-		s.SetType("array").SetItems(ogen.NewSchema().SetRef(ref))
-	} else {
-		s = g.schemaType(s, typ, fieldDescriptor.Enum())
-	}
+	name := fieldDescriptor.JSONName()
+	schema := g.mkPropertySchema(fieldDescriptor)
 
 	return ogen.Property{
 		Name:   name,
-		Schema: s,
+		Schema: schema,
 	}
 }
 
-func (g *Generator) schemaType(s *ogen.Schema, typ string, enumDescriptor protoreflect.EnumDescriptor) *ogen.Schema {
-	switch typ {
+func (g *Generator) mkPropertySchema(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Schema {
+	s := ogen.NewSchema()
+
+	switch fieldDescriptor.Cardinality() {
+	case protoreflect.Optional:
+		s = g.typ(fieldDescriptor)
+
+	case protoreflect.Repeated:
+		typName := g.typName(fieldDescriptor)
+		ref := g.respRef(typName)
+		s.SetType("array").SetItems(ogen.NewSchema().SetRef(ref))
+	}
+
+	return s
+}
+
+func (g *Generator) typName(fieldDescriptor protoreflect.FieldDescriptor) string {
+	switch {
+	case fieldDescriptor.Message() != nil:
+		fullName := string(fieldDescriptor.Message().FullName())
+		return fullName
+
+	default:
+		return fieldDescriptor.Kind().String()
+	}
+}
+
+func (g *Generator) typ(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Schema {
+	typName := g.typName(fieldDescriptor)
+	s := ogen.NewSchema()
+
+	switch typName {
 	case "bool":
 		return s.SetType("boolean")
 
@@ -166,14 +192,14 @@ func (g *Generator) schemaType(s *ogen.Schema, typ string, enumDescriptor protor
 
 	case "enum":
 		var enum []json.RawMessage
-		for i := 0; i < enumDescriptor.Values().Len(); i++ {
-			val := []byte(enumDescriptor.Values().Get(i).Name())
+		for i := 0; i < fieldDescriptor.Enum().Values().Len(); i++ {
+			val := []byte(fieldDescriptor.Enum().Values().Get(i).Name())
 			enum = append(enum, val)
 		}
 		return s.SetType("string").SetEnum(enum)
 
 	case "int32":
-		return s.SetType("integer").SetFormat(typ)
+		return s.SetType("integer").SetFormat(typName)
 
 	case "google.protobuf.DoubleValue":
 		return s.SetType("number").SetFormat("double").SetNullable(true)
@@ -185,6 +211,6 @@ func (g *Generator) schemaType(s *ogen.Schema, typ string, enumDescriptor protor
 		return s.SetType("string").SetFormat("date-time")
 
 	default:
-		return s.SetType(typ)
+		return s.SetType(typName)
 	}
 }
