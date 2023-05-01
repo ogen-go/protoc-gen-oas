@@ -87,16 +87,23 @@ func (g *Generator) mkPaths() {
 }
 
 func (g *Generator) mkGetOp(path string, method *protogen.Method) {
-	parameter := string(method.Input.Desc.Name())
-	g.parameters[parameter] = struct{}{}
+	g.mkParameters(path, method.Input.Desc)
 
 	opID := g.mkOpID(method.Desc)
-	name := string(method.Output.Desc.Name())
-	ref := g.respRef(name)
+	parameters := make([]*ogen.Parameter, 0)
+	fields := method.Input.Desc.Fields()
+	for i := 0; i < fields.Len(); i++ {
+		paramName := string(fields.Get(i).Name())
+		paramRef := g.paramRef(naming.CamelCase(paramName))
+		parameters = append(parameters, ogen.NewParameter().SetRef(paramRef))
+	}
+	respName := string(method.Output.Desc.Name())
+	respRef := g.respRef(respName)
 	op := ogen.NewOperation().
 		SetOperationID(opID).
+		SetParameters(parameters).
 		SetResponses(ogen.Responses{
-			"200": ogen.NewResponse().SetRef(ref),
+			"200": ogen.NewResponse().SetRef(respRef),
 		})
 	g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
 }
@@ -106,9 +113,59 @@ func (g *Generator) mkOpID(methodDescriptor protoreflect.MethodDescriptor) strin
 	return naming.LowerCamelCase(name)
 }
 
+func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.MessageDescriptor) {
+	curlyBracketsWords := g.curlyBracketsWords(path)
+	isPathParam := func(name string) bool {
+		_, isPathParam := curlyBracketsWords[name]
+		return isPathParam
+	}
+	fields := messageDescriptor.Fields()
+	for i := 0; i < fields.Len(); i++ {
+		name := string(fields.Get(i).Name())
+		g.mkParameter(isPathParam(name), fields.Get(i))
+	}
+}
+
+func (g *Generator) mkParameter(isPathParam bool, fieldDescriptor protoreflect.FieldDescriptor) {
+	name := string(fieldDescriptor.Name())
+	g.parameters[name] = struct{}{}
+
+	in := "query"
+	if isPathParam {
+		in = "path"
+	}
+
+	param := ogen.NewParameter().
+		SetIn(in).
+		SetName(name).
+		SetSchema(g.typ(fieldDescriptor))
+
+	g.spec.AddParameter(naming.CamelCase(name), param)
+}
+
+func (g *Generator) curlyBracketsWords(path string) map[string]struct{} {
+	words := strings.Split(path, "/")
+	curlyBracketsWords := make(map[string]struct{})
+	for _, word := range words {
+		if len(word) < 2 {
+			continue
+		}
+
+		if word[0] == '{' && word[len(word)-1] == '}' {
+			curlyBracketsWord := word[1 : len(word)-2]
+			curlyBracketsWords[curlyBracketsWord] = struct{}{}
+		}
+	}
+	return curlyBracketsWords
+}
+
 func (g *Generator) respRef(s string) string {
 	resp := naming.LastAfterDots(s)
 	return fmt.Sprintf("#/components/responses/%s", resp)
+}
+
+func (g *Generator) paramRef(s string) string {
+	return fmt.Sprintf("#/components/parameters/%s", s)
 }
 
 func (g *Generator) mkComponents() {
@@ -122,13 +179,16 @@ func (g *Generator) mkResponses() {
 }
 
 func (g *Generator) mkResponse(message *protogen.Message) {
+	name := string(message.Desc.Name())
+	if _, ok := g.responses[name]; !ok {
+		return
+	}
 	schema := ogen.NewSchema()
 	properties := make(ogen.Properties, 0, len(message.Fields))
 	for _, field := range message.Fields {
 		properties = append(properties, g.mkProperty(field.Desc))
 	}
 	schema.SetProperties(&properties)
-	name := string(message.Desc.Name())
 	g.spec.AddResponse(name, ogen.NewResponse().
 		SetDescription(name).
 		SetContent(map[string]ogen.Media{

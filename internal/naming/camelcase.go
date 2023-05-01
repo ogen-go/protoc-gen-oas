@@ -5,6 +5,21 @@ import (
 	"unicode"
 )
 
+// CamelCase returns string as CamelCase.
+func CamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+	first := rune(s[0])
+	if unicode.IsUpper(first) {
+		return s
+	}
+	var camelCase strings.Builder
+	camelCase.WriteRune(unicode.ToUpper(first))
+	camelCase.WriteString(s[1:])
+	return camelCase.String()
+}
+
 // LowerCamelCase returns string as lowerCamelCase.
 func LowerCamelCase(s string) string {
 	if s == "" {
