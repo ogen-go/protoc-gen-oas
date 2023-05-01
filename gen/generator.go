@@ -135,10 +135,13 @@ func (g *Generator) mkParameter(isPathParam bool, fieldDescriptor protoreflect.F
 		in = "path"
 	}
 
+	s := g.typ(fieldDescriptor)
+	isRequired := !s.Nullable
 	param := ogen.NewParameter().
 		SetIn(in).
 		SetName(name).
-		SetSchema(g.typ(fieldDescriptor))
+		SetSchema(s).
+		SetRequired(isRequired)
 
 	g.spec.AddParameter(naming.CamelCase(name), param)
 }
@@ -183,12 +186,18 @@ func (g *Generator) mkResponse(message *protogen.Message) {
 	if _, ok := g.responses[name]; !ok {
 		return
 	}
+
 	schema := ogen.NewSchema()
 	properties := make(ogen.Properties, 0, len(message.Fields))
+	r := make([]string, 0)
 	for _, field := range message.Fields {
-		properties = append(properties, g.mkProperty(field.Desc))
+		prop := g.mkProperty(field.Desc)
+		properties = append(properties, prop)
+		if !prop.Schema.Nullable {
+			r = append(r, field.Desc.JSONName())
+		}
 	}
-	schema.SetProperties(&properties)
+	schema.SetProperties(&properties).SetRequired(r)
 	g.spec.AddResponse(name, ogen.NewResponse().
 		SetDescription(name).
 		SetContent(map[string]ogen.Media{
