@@ -29,15 +29,26 @@ func run() error {
 	}
 
 	p := func(plugin *protogen.Plugin) error {
-		_, _ = gen.NewGenerator(
+		g, err := gen.NewGenerator(
 			plugin.Files,
 			gen.WithSpecOpenAPI(*openapi),
 			gen.WithSpecInfoTitle(*title),
 			gen.WithSpecInfoDescription(*description),
 			gen.WithSpecInfoVersion(*version),
 		)
+		if err != nil {
+			return err
+		}
 
-		// TODO(sashamelentyev): add stdout or file writer.
+		bytes, err := g.YAML()
+		if err != nil {
+			return err
+		}
+
+		gf := plugin.NewGeneratedFile("openapi.yaml", "")
+		if _, err := gf.Write(bytes); err != nil {
+			return err
+		}
 
 		return nil
 	}
