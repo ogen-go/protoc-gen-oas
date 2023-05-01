@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/go-faster/yaml"
 	"github.com/ogen-go/ogen"
 )
 
@@ -41,6 +42,11 @@ type Generator struct {
 	methods  []*protogen.Method
 	messages []*protogen.Message
 	spec     *ogen.Spec
+}
+
+// YAML returns OpenAPI specification bytes.
+func (g *Generator) YAML() ([]byte, error) {
+	return yaml.Marshal(g.spec)
 }
 
 func (g *Generator) mkPaths() {

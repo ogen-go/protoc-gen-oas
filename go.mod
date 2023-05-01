@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/go-faster/errors v0.6.1
+	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v0.66.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.30.0
@@ -14,7 +15,6 @@ require (
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/jx v1.0.0 // indirect
-	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
