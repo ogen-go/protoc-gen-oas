@@ -73,7 +73,7 @@ func (g *Generator) mkPaths() {
 	for _, method := range g.methods {
 		ext := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
 		httpRule, ok := ext.(*annotations.HttpRule)
-		if !ok {
+		if !ok || httpRule == nil {
 			continue
 		}
 
