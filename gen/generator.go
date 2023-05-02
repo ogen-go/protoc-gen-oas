@@ -20,6 +20,7 @@ import (
 func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
 	g.spec = ogen.NewSpec()
+	g.spec.SetOpenAPI("3.0.0")
 	g.responses = make(map[string]struct{})
 	g.requestBodies = make(map[string]struct{})
 	g.parameters = make(map[string]struct{})
@@ -61,6 +62,11 @@ type Generator struct {
 // YAML returns OpenAPI specification bytes.
 func (g *Generator) YAML() ([]byte, error) {
 	return yaml.Marshal(g.spec)
+}
+
+// JSON returns OpenAPI specification bytes.
+func (g *Generator) JSON() ([]byte, error) {
+	return json.Marshal(g.spec)
 }
 
 func (g *Generator) mkPaths() {
