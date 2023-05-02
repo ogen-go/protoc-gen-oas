@@ -1,0 +1,33 @@
+proto_file: {
+  name: "service.proto"
+  package: "service.v1"
+  message_type: {
+    name: "Request"
+    field: {
+				name: "id"
+				number: 1
+				label: LABEL_OPTIONAL
+				type: TYPE_STRING
+				json_name: "id"
+			}
+  }
+  message_type: {
+    name: "Response"
+  }
+  service: {
+    name: "Service"
+    method: {
+      name: "GetMethod"
+      input_type: "Request"
+      output_type: "Response"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/{id}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}
