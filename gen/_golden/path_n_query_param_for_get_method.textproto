@@ -4,19 +4,19 @@ proto_file: {
   message_type: {
     name: "Request"
     field: {
-			name: "id"
-			number: 1
-			label: LABEL_OPTIONAL
-			type: TYPE_STRING
-			json_name: "id"
-		}
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
     field: {
-			name: "query"
-			number: 2
-			label: LABEL_OPTIONAL
-			type: TYPE_STRING
-			json_name: "query"
-		}
+      name: "query"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "query"
+    }
   }
   message_type: {
     name: "Response"
