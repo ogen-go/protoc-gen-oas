@@ -20,7 +20,6 @@ import (
 func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
 	g.spec = ogen.NewSpec()
-	g.spec.SetOpenAPI("3.1.0")
 	g.responses = make(map[string]struct{})
 	g.requestBodies = make(map[string]struct{})
 	g.parameters = make(map[string]struct{})
