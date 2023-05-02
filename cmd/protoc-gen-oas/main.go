@@ -16,7 +16,7 @@ import (
 func run() error {
 	set := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	openapi := set.String("openapi", "3.0.0", "OpenAPI version")
+	openapi := set.String("openapi", "3.1.0", "OpenAPI version")
 	title := set.String("title", "", "Title")
 	description := set.String("description", "", "Description")
 	version := set.String("version", "", "Version")
