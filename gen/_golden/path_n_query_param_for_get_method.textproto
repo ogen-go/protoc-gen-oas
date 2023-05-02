@@ -10,6 +10,13 @@ proto_file: {
       type: TYPE_STRING
       json_name: "id"
     }
+    field: {
+      name: "query"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "query"
+    }
   }
   message_type: {
     name: "Response"
