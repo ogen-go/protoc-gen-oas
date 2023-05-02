@@ -161,7 +161,7 @@ func (g *Generator) curlyBracketsWords(path string) map[string]struct{} {
 		}
 
 		if word[0] == '{' && word[len(word)-1] == '}' {
-			curlyBracketsWord := word[1 : len(word)-2]
+			curlyBracketsWord := word[1 : len(word)-1]
 			curlyBracketsWords[curlyBracketsWord] = struct{}{}
 		}
 	}
