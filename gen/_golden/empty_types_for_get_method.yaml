@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+    title: ""
+    version: ""
+paths:
+    /api/v1:
+        get:
+            operationId: getMethod
+            responses:
+                "200":
+                    $ref: '#/components/responses/Response'
+components:
+    responses:
+        Response:
+            description: Response
+            content:
+                application/json:
+                    schema:
+                        type: object
