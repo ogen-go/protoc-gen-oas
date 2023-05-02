@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/pluginpb"
 
 	"github.com/go-faster/errors"
 
@@ -29,6 +30,8 @@ func run() error {
 	}
 
 	p := func(plugin *protogen.Plugin) error {
+		plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+
 		g, err := gen.NewGenerator(
 			plugin.Files,
 			gen.WithSpecOpenAPI(*openapi),
