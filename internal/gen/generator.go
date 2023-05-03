@@ -169,7 +169,6 @@ func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.Mes
 		g.mkParameter(isPathParam(paramName), fields.Get(i))
 	}
 
-	
 	return parameters
 }
 
