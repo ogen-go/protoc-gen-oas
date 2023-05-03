@@ -25,7 +25,7 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 	g.parameters = make(map[string]struct{})
 
 	for _, file := range protoFiles {
-		if has := strings.HasPrefix(file.GeneratedFilenamePrefix, "google.golang.org"); has {
+		if isSkip := file.Generate; isSkip {
 			continue
 		}
 
@@ -139,11 +139,11 @@ func (g *Generator) mkPatchOp(path string, method *protogen.Method) {
 func (g *Generator) mkOp(method *protogen.Method) *ogen.Operation {
 	opID := g.mkOpID(method.Desc)
 	respName := string(method.Output.Desc.Name())
-	respRef := g.respRef(respName)
+	ref := respRef(respName)
 	return ogen.NewOperation().
 		SetOperationID(opID).
 		SetResponses(ogen.Responses{
-			"200": ogen.NewResponse().SetRef(respRef),
+			"200": ogen.NewResponse().SetRef(ref),
 		})
 }
 
@@ -153,7 +153,7 @@ func (g *Generator) mkOpID(methodDescriptor protoreflect.MethodDescriptor) strin
 }
 
 func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.MessageDescriptor) []*ogen.Parameter {
-	curlyBracketsWords := g.curlyBracketsWords(path)
+	curlyBracketsWords := curlyBracketsWords(path)
 	isPathParam := func(name string) bool {
 		_, isPathParam := curlyBracketsWords[name]
 		return isPathParam
@@ -164,8 +164,8 @@ func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.Mes
 	fields := messageDescriptor.Fields()
 	for i := 0; i < fields.Len(); i++ {
 		paramName := string(fields.Get(i).Name())
-		paramRef := g.paramRef(naming.CamelCase(paramName))
-		parameters = append(parameters, ogen.NewParameter().SetRef(paramRef))
+		ref := paramRef(naming.CamelCase(paramName))
+		parameters = append(parameters, ogen.NewParameter().SetRef(ref))
 		g.mkParameter(isPathParam(paramName), fields.Get(i))
 	}
 
@@ -181,7 +181,7 @@ func (g *Generator) mkParameter(isPathParam bool, fieldDescriptor protoreflect.F
 		in = "path"
 	}
 
-	s := g.typ(fieldDescriptor)
+	s := typ(fieldDescriptor)
 	isRequired := !s.Nullable
 	param := ogen.NewParameter().
 		SetIn(in).
@@ -190,31 +190,6 @@ func (g *Generator) mkParameter(isPathParam bool, fieldDescriptor protoreflect.F
 		SetRequired(isRequired)
 
 	g.spec.AddParameter(naming.CamelCase(name), param)
-}
-
-func (g *Generator) curlyBracketsWords(path string) map[string]struct{} {
-	words := strings.Split(path, "/")
-	curlyBracketsWords := make(map[string]struct{})
-	for _, word := range words {
-		if len(word) < 2 {
-			continue
-		}
-
-		if word[0] == '{' && word[len(word)-1] == '}' {
-			curlyBracketsWord := word[1 : len(word)-1]
-			curlyBracketsWords[curlyBracketsWord] = struct{}{}
-		}
-	}
-	return curlyBracketsWords
-}
-
-func (g *Generator) respRef(s string) string {
-	resp := naming.LastAfterDots(s)
-	return fmt.Sprintf("#/components/responses/%s", resp)
-}
-
-func (g *Generator) paramRef(s string) string {
-	return fmt.Sprintf("#/components/parameters/%s", s)
 }
 
 func (g *Generator) mkComponents() {
@@ -269,30 +244,19 @@ func (g *Generator) mkPropertySchema(fieldDescriptor protoreflect.FieldDescripto
 
 	switch fieldDescriptor.Cardinality() {
 	case protoreflect.Optional:
-		s = g.typ(fieldDescriptor)
+		s = typ(fieldDescriptor)
 
 	case protoreflect.Repeated:
-		typName := g.typName(fieldDescriptor)
-		ref := g.respRef(typName)
+		typName := typName(fieldDescriptor)
+		ref := respRef(typName)
 		s.SetType("array").SetItems(ogen.NewSchema().SetRef(ref))
 	}
 
 	return s
 }
 
-func (g *Generator) typName(fieldDescriptor protoreflect.FieldDescriptor) string {
-	switch {
-	case fieldDescriptor.Message() != nil:
-		fullName := string(fieldDescriptor.Message().FullName())
-		return fullName
-
-	default:
-		return fieldDescriptor.Kind().String()
-	}
-}
-
-func (g *Generator) typ(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Schema {
-	typName := g.typName(fieldDescriptor)
+func typ(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Schema {
+	typName := typName(fieldDescriptor)
 	s := ogen.NewSchema()
 
 	switch typName {
@@ -306,11 +270,7 @@ func (g *Generator) typ(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Sche
 		return s.SetType("number").SetFormat("double")
 
 	case "enum":
-		var enum []json.RawMessage
-		for i := 0; i < fieldDescriptor.Enum().Values().Len(); i++ {
-			val := []byte(fieldDescriptor.Enum().Values().Get(i).Name())
-			enum = append(enum, val)
-		}
+		enum := enum(fieldDescriptor.Enum())
 		return s.SetType("string").SetEnum(enum)
 
 	case "int32":
@@ -327,5 +287,51 @@ func (g *Generator) typ(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Sche
 
 	default:
 		return s.SetType(typName)
+	}
+}
+
+func enum(enumDescriptor protoreflect.EnumDescriptor) []json.RawMessage {
+	values := enumDescriptor.Values()
+	enum := make([]json.RawMessage, 0, values.Len())
+	for i := 0; i < values.Len(); i++ {
+		val := []byte(values.Get(i).Name())
+		enum = append(enum, val)
+	}
+	return enum
+}
+
+func curlyBracketsWords(path string) map[string]struct{} {
+	words := strings.Split(path, "/")
+	curlyBracketsWords := make(map[string]struct{})
+	for _, word := range words {
+		if len(word) < 2 {
+			continue
+		}
+
+		if word[0] == '{' && word[len(word)-1] == '}' {
+			curlyBracketsWord := word[1 : len(word)-1]
+			curlyBracketsWords[curlyBracketsWord] = struct{}{}
+		}
+	}
+	return curlyBracketsWords
+}
+
+func respRef(s string) string {
+	resp := naming.LastAfterDots(s)
+	return fmt.Sprintf("#/components/responses/%s", resp)
+}
+
+func paramRef(s string) string {
+	return fmt.Sprintf("#/components/parameters/%s", s)
+}
+
+func typName(fieldDescriptor protoreflect.FieldDescriptor) string {
+	switch {
+	case fieldDescriptor.Message() != nil:
+		fullName := string(fieldDescriptor.Message().FullName())
+		return fullName
+
+	default:
+		return fieldDescriptor.Kind().String()
 	}
 }
