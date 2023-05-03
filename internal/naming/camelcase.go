@@ -1,10 +1,5 @@
 package naming
 
-import (
-	"strings"
-	"unicode"
-)
-
 // Is c an ASCII lower-case letter?
 func isASCIILower(c byte) bool {
 	return 'a' <= c && c <= 'z'
@@ -63,18 +58,7 @@ func CamelCase(s string) string {
 	return string(t)
 }
 
-// LowerCamelCase returns string as lowerCamelCase.
+// LowerCamelCase returns the lowerCamelCased name.
 func LowerCamelCase(s string) string {
-	if s == "" {
-		return ""
-	}
-	s = CamelCase(s)
-	first := rune(s[0])
-	if unicode.IsLower(first) {
-		return s
-	}
-	var lowerCamelCase strings.Builder
-	lowerCamelCase.WriteRune(unicode.ToLower(first))
-	lowerCamelCase.WriteString(s[1:])
-	return lowerCamelCase.String()
+	return Decapitalize(CamelCase(s))
 }
