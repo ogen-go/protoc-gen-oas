@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-faster/errors"
 
-	"github.com/ogen-go/protoc-gen-oas/gen"
+	"github.com/ogen-go/protoc-gen-oas/internal/gen"
 )
 
 func run() error {
