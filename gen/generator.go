@@ -70,24 +70,28 @@ func (g *Generator) JSON() ([]byte, error) {
 
 func (g *Generator) mkPaths() {
 	for _, method := range g.methods {
-		ext := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
-		httpRule, ok := ext.(*annotations.HttpRule)
-		if !ok || httpRule == nil {
-			continue
-		}
+		g.mkPath(method)
+	}
+}
 
-		response := string(method.Output.Desc.Name())
-		g.responses[response] = struct{}{}
+func (g *Generator) mkPath(method *protogen.Method) {
+	ext := proto.GetExtension(method.Desc.Options(), annotations.E_Http)
+	httpRule, ok := ext.(*annotations.HttpRule)
+	if !ok || httpRule == nil {
+		return
+	}
 
-		switch path := httpRule.Pattern.(type) {
-		case *annotations.HttpRule_Get:
-			g.mkGetOp(path.Get, method)
+	response := string(method.Output.Desc.Name())
+	g.responses[response] = struct{}{}
 
-		case *annotations.HttpRule_Put:
-		case *annotations.HttpRule_Post:
-		case *annotations.HttpRule_Delete:
-		case *annotations.HttpRule_Patch:
-		}
+	switch path := httpRule.Pattern.(type) {
+	case *annotations.HttpRule_Get:
+		g.mkGetOp(path.Get, method)
+
+	case *annotations.HttpRule_Put:
+	case *annotations.HttpRule_Post:
+	case *annotations.HttpRule_Delete:
+	case *annotations.HttpRule_Patch:
 	}
 }
 
