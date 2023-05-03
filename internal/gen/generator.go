@@ -89,32 +89,62 @@ func (g *Generator) mkPath(method *protogen.Method) {
 		g.mkGetOp(path.Get, method)
 
 	case *annotations.HttpRule_Put:
+		g.mkPutOp(path.Put, method)
+
 	case *annotations.HttpRule_Post:
+		g.mkPostOp(path.Post, method)
+
 	case *annotations.HttpRule_Delete:
+		g.mkDeleteOp(path.Delete, method)
+
 	case *annotations.HttpRule_Patch:
+		g.mkPatchOp(path.Patch, method)
 	}
 }
 
 func (g *Generator) mkGetOp(path string, method *protogen.Method) {
-	g.mkParameters(path, method.Input.Desc)
+	parameters := g.mkParameters(path, method.Input.Desc)
+	op := g.mkOp(method)
+	op.SetParameters(parameters)
+	g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
+}
 
+func (g *Generator) mkPutOp(path string, method *protogen.Method) {
+	// TODO(sashamelentyev): add requestBodies
+	// TODO(sashamelentyev): add path params
+	op := g.mkOp(method)
+	g.spec.AddPathItem(path, ogen.NewPathItem().SetPut(op))
+}
+
+func (g *Generator) mkPostOp(path string, method *protogen.Method) {
+	// TODO(sashamelentyev): add requestBodies
+	op := g.mkOp(method)
+	g.spec.AddPathItem(path, ogen.NewPathItem().SetPost(op))
+}
+
+func (g *Generator) mkDeleteOp(path string, method *protogen.Method) {
+	parameters := g.mkParameters(path, method.Input.Desc)
+	op := g.mkOp(method)
+	op.SetParameters(parameters)
+	g.spec.AddPathItem(path, ogen.NewPathItem().SetDelete(op))
+}
+
+func (g *Generator) mkPatchOp(path string, method *protogen.Method) {
+	// TODO(sashamelentyev): add requestBodies
+	// TODO(sashamelentyev): add path params
+	op := g.mkOp(method)
+	g.spec.AddPathItem(path, ogen.NewPathItem().SetPatch(op))
+}
+
+func (g *Generator) mkOp(method *protogen.Method) *ogen.Operation {
 	opID := g.mkOpID(method.Desc)
-	parameters := make([]*ogen.Parameter, 0)
-	fields := method.Input.Desc.Fields()
-	for i := 0; i < fields.Len(); i++ {
-		paramName := string(fields.Get(i).Name())
-		paramRef := g.paramRef(naming.CamelCase(paramName))
-		parameters = append(parameters, ogen.NewParameter().SetRef(paramRef))
-	}
 	respName := string(method.Output.Desc.Name())
 	respRef := g.respRef(respName)
-	op := ogen.NewOperation().
+	return ogen.NewOperation().
 		SetOperationID(opID).
-		SetParameters(parameters).
 		SetResponses(ogen.Responses{
 			"200": ogen.NewResponse().SetRef(respRef),
 		})
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
 }
 
 func (g *Generator) mkOpID(methodDescriptor protoreflect.MethodDescriptor) string {
@@ -122,17 +152,24 @@ func (g *Generator) mkOpID(methodDescriptor protoreflect.MethodDescriptor) strin
 	return naming.LowerCamelCase(name)
 }
 
-func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.MessageDescriptor) {
+func (g *Generator) mkParameters(path string, messageDescriptor protoreflect.MessageDescriptor) []*ogen.Parameter {
 	curlyBracketsWords := g.curlyBracketsWords(path)
 	isPathParam := func(name string) bool {
 		_, isPathParam := curlyBracketsWords[name]
 		return isPathParam
 	}
+
+	parameters := make([]*ogen.Parameter, 0)
+
 	fields := messageDescriptor.Fields()
 	for i := 0; i < fields.Len(); i++ {
-		name := string(fields.Get(i).Name())
-		g.mkParameter(isPathParam(name), fields.Get(i))
+		paramName := string(fields.Get(i).Name())
+		paramRef := g.paramRef(naming.CamelCase(paramName))
+		parameters = append(parameters, ogen.NewParameter().SetRef(paramRef))
+		g.mkParameter(isPathParam(paramName), fields.Get(i))
 	}
+
+	return parameters
 }
 
 func (g *Generator) mkParameter(isPathParam bool, fieldDescriptor protoreflect.FieldDescriptor) {
