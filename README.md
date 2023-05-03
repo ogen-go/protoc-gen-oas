@@ -2,6 +2,8 @@
 
 Work in progress.
 
+`protoc-gen-oas` is protoc plugin for generate OpenAPI v3.x.x from proto files.
+
 # Install
 
 ```console
