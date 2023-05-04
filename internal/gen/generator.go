@@ -18,7 +18,7 @@ import (
 )
 
 // ErrNoMethods reports that service have no methods.
-var ErrNoMethods = errors.New("service has no methods")
+var ErrNoMethods = errors.New("protoc-gen-oas: service has no methods")
 
 // NewGenerator returns new Generator instance.
 func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
