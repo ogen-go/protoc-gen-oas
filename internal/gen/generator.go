@@ -126,15 +126,17 @@ func (g *Generator) mkGetOp(path string, method *protogen.Method) {
 
 func (g *Generator) mkPutOp(path string, method *protogen.Method) {
 	pathParams := g.mkPathParams(path, method.Input.Desc)
-	// TODO(sashamelentyev): add requestBodies
+	reqBody := g.mkReqBody(path, method.Input.Desc)
 	op := g.mkOp(method)
 	op.AddParameters(pathParams...)
+	op.SetRequestBody(reqBody)
 	g.spec.AddPathItem(path, ogen.NewPathItem().SetPut(op))
 }
 
 func (g *Generator) mkPostOp(path string, method *protogen.Method) {
-	// TODO(sashamelentyev): add requestBodies
+	reqBody := g.mkReqBody(path, method.Input.Desc)
 	op := g.mkOp(method)
+	op.SetRequestBody(reqBody)
 	g.spec.AddPathItem(path, ogen.NewPathItem().SetPost(op))
 }
 
@@ -147,9 +149,10 @@ func (g *Generator) mkDeleteOp(path string, method *protogen.Method) {
 
 func (g *Generator) mkPatchOp(path string, method *protogen.Method) {
 	pathParams := g.mkPathParams(path, method.Input.Desc)
-	// TODO(sashamelentyev): add requestBodies
+	reqBody := g.mkReqBody(path, method.Input.Desc)
 	op := g.mkOp(method)
 	op.AddParameters(pathParams...)
+	op.SetRequestBody(reqBody)
 	g.spec.AddPathItem(path, ogen.NewPathItem().SetPatch(op))
 }
 
@@ -162,6 +165,49 @@ func (g *Generator) mkOp(method *protogen.Method) *ogen.Operation {
 		SetResponses(ogen.Responses{
 			"200": ogen.NewResponse().SetRef(ref),
 		})
+}
+
+func (g *Generator) mkReqBody(path string, md protoreflect.MessageDescriptor) *ogen.RequestBody {
+	name := naming.CamelCase(string(md.Name()))
+	ref := reqBodyRef(name)
+	g.spec.AddRequestBody(name, ogen.NewRequestBody().SetContent(g.mkReqBodyContent(path, md)))
+	return ogen.NewRequestBody().SetRef(ref)
+}
+
+func (g *Generator) mkReqBodyContent(path string, md protoreflect.MessageDescriptor) map[string]ogen.Media {
+	if md.Fields().Len() == 0 {
+		return map[string]ogen.Media{
+			"application/json": {},
+		}
+	}
+
+	curlyBracketsWords := curlyBracketsWords(path)
+	isPathParam := func(pathName string) bool {
+		_, isPathParam := curlyBracketsWords[pathName]
+		return isPathParam
+	}
+
+	props := make(ogen.Properties, 0, md.Fields().Len())
+	r := make([]string, 0)
+
+	for i := 0; i < md.Fields().Len(); i++ {
+		field := md.Fields().Get(i)
+		name := string(field.Name())
+		if isPathParam(name) {
+			continue
+		}
+		prop := mkProperty(field)
+		props = append(props, prop)
+		if !prop.Schema.Nullable {
+			r = append(r, field.JSONName())
+		}
+	}
+
+	return map[string]ogen.Media{
+		"application/json": {
+			Schema: ogen.NewSchema().SetProperties(&props).SetRequired(r),
+		},
+	}
 }
 
 func (g *Generator) mkPathParams(path string, md protoreflect.MessageDescriptor) []*ogen.Parameter {
@@ -371,6 +417,10 @@ func respRef(s string) string {
 
 func paramRef(s string) string {
 	return fmt.Sprintf("#/components/parameters/%s", s)
+}
+
+func reqBodyRef(s string) string {
+	return fmt.Sprintf("#/components/requestBodies/%s", s)
 }
 
 func typName(fieldDescriptor protoreflect.FieldDescriptor) string {
