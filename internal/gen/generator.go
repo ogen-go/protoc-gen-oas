@@ -10,19 +10,20 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
+	"github.com/go-faster/errors"
 	"github.com/go-faster/yaml"
 	"github.com/ogen-go/ogen"
 
 	"github.com/ogen-go/protoc-gen-oas/internal/naming"
 )
 
+// ErrNoMethods reports that service have no methods.
+var ErrNoMethods = errors.New("protoc-gen-oas: service has no methods")
+
 // NewGenerator returns new Generator instance.
 func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
-	g.spec = ogen.NewSpec()
-	g.responses = make(map[string]struct{})
-	g.requestBodies = make(map[string]struct{})
-	g.parameters = make(map[string]struct{})
+	g.init()
 
 	for _, file := range protoFiles {
 		if isSkip := !file.Generate; isSkip {
@@ -35,6 +36,10 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 
 		g.messages = append(g.messages, file.Messages...)
 		g.enums = append(g.enums, file.Enums...)
+	}
+
+	if len(g.methods) == 0 {
+		return nil, ErrNoMethods
 	}
 
 	for _, opt := range opts {
@@ -66,6 +71,13 @@ func (g *Generator) YAML() ([]byte, error) {
 // JSON returns OpenAPI specification bytes.
 func (g *Generator) JSON() ([]byte, error) {
 	return json.Marshal(g.spec)
+}
+
+func (g *Generator) init() {
+	g.responses = make(map[string]struct{})
+	g.requestBodies = make(map[string]struct{})
+	g.parameters = make(map[string]struct{})
+	g.spec = ogen.NewSpec()
 }
 
 func (g *Generator) mkPaths() {
