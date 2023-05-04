@@ -121,7 +121,11 @@ func (g *Generator) mkGetOp(path string, method *protogen.Method) {
 	op := g.mkOp(method)
 	op.AddParameters(pathParams...)
 	op.AddParameters(queryParams...)
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
+	if g.spec.Paths[path] == nil {
+		g.spec.AddPathItem(path, ogen.NewPathItem().SetGet(op))
+	} else {
+		g.spec.Paths[path].SetGet(op)
+	}
 }
 
 func (g *Generator) mkPutOp(path string, method *protogen.Method) {
@@ -130,21 +134,33 @@ func (g *Generator) mkPutOp(path string, method *protogen.Method) {
 	op := g.mkOp(method)
 	op.AddParameters(pathParams...)
 	op.SetRequestBody(reqBody)
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetPut(op))
+	if g.spec.Paths[path] == nil {
+		g.spec.AddPathItem(path, ogen.NewPathItem().SetPut(op))
+	} else {
+		g.spec.Paths[path].SetPut(op)
+	}
 }
 
 func (g *Generator) mkPostOp(path string, method *protogen.Method) {
 	reqBody := g.mkReqBody(path, method.Input.Desc)
 	op := g.mkOp(method)
 	op.SetRequestBody(reqBody)
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetPost(op))
+	if g.spec.Paths[path] == nil {
+		g.spec.AddPathItem(path, ogen.NewPathItem().SetPost(op))
+	} else {
+		g.spec.Paths[path].SetPost(op)
+	}
 }
 
 func (g *Generator) mkDeleteOp(path string, method *protogen.Method) {
 	pathParams := g.mkPathParams(path, method.Input.Desc)
 	op := g.mkOp(method)
 	op.SetParameters(pathParams)
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetDelete(op))
+	if g.spec.Paths[path] == nil {
+		g.spec.AddPathItem(path, ogen.NewPathItem().SetDelete(op))
+	} else {
+		g.spec.Paths[path].SetDelete(op)
+	}
 }
 
 func (g *Generator) mkPatchOp(path string, method *protogen.Method) {
@@ -153,7 +169,11 @@ func (g *Generator) mkPatchOp(path string, method *protogen.Method) {
 	op := g.mkOp(method)
 	op.AddParameters(pathParams...)
 	op.SetRequestBody(reqBody)
-	g.spec.AddPathItem(path, ogen.NewPathItem().SetPatch(op))
+	if g.spec.Paths[path] == nil {
+		g.spec.AddPathItem(path, ogen.NewPathItem().SetPatch(op))
+	} else {
+		g.spec.Paths[path].SetPatch(op)
+	}
 }
 
 func (g *Generator) mkOp(method *protogen.Method) *ogen.Operation {
