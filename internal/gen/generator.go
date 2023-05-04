@@ -23,7 +23,6 @@ var ErrNoMethods = errors.New("protoc-gen-oas: service has no methods")
 // NewGenerator returns new Generator instance.
 func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
-	g.init()
 
 	for _, file := range protoFiles {
 		if isSkip := !file.Generate; isSkip {
@@ -41,6 +40,8 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 	if len(g.methods) == 0 {
 		return nil, ErrNoMethods
 	}
+
+	g.init()
 
 	for _, opt := range opts {
 		opt(g)
