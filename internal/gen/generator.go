@@ -25,7 +25,7 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 	g.parameters = make(map[string]struct{})
 
 	for _, file := range protoFiles {
-		if isSkip := file.Generate; isSkip {
+		if isSkip := !file.Generate; isSkip {
 			continue
 		}
 

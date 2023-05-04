@@ -44,6 +44,10 @@ func TestNewGenerator(t *testing.T) {
 			p, err := opts.New(req)
 			require.NoError(t, err)
 
+			for i := 0; i < len(p.Files); i++ {
+				p.Files[i].Generate = true
+			}
+
 			g, err := NewGenerator(p.Files, WithSpecOpenAPI("3.1.0"))
 			require.NoError(t, err)
 
