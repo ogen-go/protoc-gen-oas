@@ -1,0 +1,191 @@
+proto_file: {
+  name: "crud.proto"
+  package: "crud.v1"
+  message_type: {
+    name: "CreateItemRequest"
+    field: {
+      name: "name"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "name"
+    }
+  }
+  message_type: {
+    name: "Item"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+    field: {
+      name: "name"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "name"
+    }
+  }
+  message_type: {
+    name: "GetItemsRequest"
+    field: {
+      name: "limit"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_INT32
+      json_name: "name"
+    }
+    field: {
+      name: "offset"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_INT32
+      json_name: "name"
+    }
+  }
+  message_type: {
+    name: "GetItemsResponse"
+    field: {
+      name: "items"
+      number: 1
+      label: LABEL_REPEATED
+      type_name: "Item"
+      json_name: "items"
+    }
+    field: {
+      name: "total_count"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_INT32
+      json_name: "totalCount"
+    }
+  }
+  message_type: {
+    name: "GetItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+  }
+  message_type: {
+    name: "UpdateItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+    field: {
+      name: "name"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "name"
+    }
+  }
+  message_type: {
+    name: "PatchItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+    field: {
+      name: "name"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "name"
+    }
+  }
+  message_type: {
+    name: "DeleteItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+  }
+  message_type: {
+    name: "Empty"
+  }
+  service: {
+    name: "Crud"
+    method: {
+      name: "CreateItem"
+      input_type: "CreateItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          post: "/api/v1/items"
+          body: "*"
+        }
+      }
+    }
+    method: {
+      name: "GetItems"
+      input_type: "GetItemsRequest"
+      output_type: "GetItemsResponse"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/items"
+        }
+      }
+    }
+    method: {
+      name: "GetItem"
+      input_type: "GetItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/items/{id}"
+        }
+      }
+    }
+    method: {
+      name: "UpdateItem"
+      input_type: "UpdateItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          put: "/api/v1/items/{id}"
+          body: "*"
+        }
+      }
+    }
+    method: {
+      name: "PatchItem"
+      input_type: "PatchItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          patch: "/api/v1/items/{id}"
+          body: "*"
+        }
+      }
+    }
+    method: {
+      name: "DeleteItem"
+      input_type: "DeleteItemRequest"
+      output_type: "Empty"
+      options: {
+        [google.api.http]: {
+          delete: "/api/v1/items/{id}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}
