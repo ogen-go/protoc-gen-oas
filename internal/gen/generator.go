@@ -58,6 +58,7 @@ type Generator struct {
 	methods       []*protogen.Method
 	messages      []*protogen.Message
 	enums         []*protogen.Enum
+	schemas       map[string]struct{}
 	responses     map[string]struct{}
 	requestBodies map[string]struct{}
 	parameters    map[string]struct{}
@@ -75,6 +76,7 @@ func (g *Generator) JSON() ([]byte, error) {
 }
 
 func (g *Generator) init() {
+	g.schemas = make(map[string]struct{})
 	g.responses = make(map[string]struct{})
 	g.requestBodies = make(map[string]struct{})
 	g.parameters = make(map[string]struct{})
@@ -216,7 +218,7 @@ func (g *Generator) mkReqBodyContent(path string, md protoreflect.MessageDescrip
 		if isPathParam(name) {
 			continue
 		}
-		prop := mkProperty(field)
+		prop := g.mkProperty(field)
 		props = append(props, prop)
 		if !prop.Schema.Nullable {
 			r = append(r, field.JSONName())
@@ -321,7 +323,7 @@ func (g *Generator) mkResponse(message *protogen.Message) {
 	properties := make(ogen.Properties, 0, len(message.Fields))
 	r := make([]string, 0)
 	for _, field := range message.Fields {
-		prop := mkProperty(field.Desc)
+		prop := g.mkProperty(field.Desc)
 		properties = append(properties, prop)
 		if !prop.Schema.Nullable {
 			r = append(r, field.Desc.JSONName())
@@ -343,9 +345,9 @@ func mkOpID(methodDescriptor protoreflect.MethodDescriptor) string {
 	return naming.LowerCamelCase(name)
 }
 
-func mkProperty(fieldDescriptor protoreflect.FieldDescriptor) ogen.Property {
-	name := fieldDescriptor.JSONName()
-	schema := mkPropertySchema(fieldDescriptor)
+func (g *Generator) mkProperty(fd protoreflect.FieldDescriptor) ogen.Property {
+	name := fd.JSONName()
+	schema := g.mkPropertySchema(fd)
 
 	return ogen.Property{
 		Name:   name,
@@ -353,17 +355,22 @@ func mkProperty(fieldDescriptor protoreflect.FieldDescriptor) ogen.Property {
 	}
 }
 
-func mkPropertySchema(fieldDescriptor protoreflect.FieldDescriptor) *ogen.Schema {
+func (g *Generator) mkPropertySchema(fd protoreflect.FieldDescriptor) *ogen.Schema {
 	s := ogen.NewSchema()
 
-	switch fieldDescriptor.Cardinality() {
+	switch fd.Cardinality() {
 	case protoreflect.Optional:
-		s = typ(fieldDescriptor)
+		s = typ(fd)
 
 	case protoreflect.Repeated:
-		typName := typName(fieldDescriptor)
-		ref := respRef(typName)
-		s.SetType("array").SetItems(ogen.NewSchema().SetRef(ref))
+		n := naming.LastAfterDots(typName(fd))
+
+		if resp, ok := g.spec.Components.Responses[n]; ok {
+			if c, ok := resp.Content["application/json"]; ok {
+				g.spec.AddSchema(n, c.Schema)
+				s.SetType("array").SetItems(ogen.NewSchema().SetRef(schemaRef(n)))
+			}
+		}
 	}
 
 	return s
@@ -428,6 +435,10 @@ func curlyBracketsWords(path string) map[string]struct{} {
 		}
 	}
 	return curlyBracketsWords
+}
+
+func schemaRef(s string) string {
+	return fmt.Sprintf("#/components/schemas/%s", s)
 }
 
 func respRef(s string) string {
