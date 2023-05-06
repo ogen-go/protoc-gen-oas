@@ -65,20 +65,28 @@ type Method struct {
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
 
-// PathParams returns path parameters with ref only.
-func (m *Method) PathParams() []*ogen.Parameter {
-	pathParams := make([]*ogen.Parameter, 0, len(m.PathParamsFields()))
-
-	for _, field := range m.PathParamsFields() {
-		ref := paramRef(field.Name.CamelCase())
-		pathParams = append(pathParams, ogen.NewParameter().SetRef(ref))
-	}
-
-	return pathParams
+// Parameters returns path and query parameters.
+func (m *Method) Parameters() []*ogen.Parameter {
+	parameters := make([]*ogen.Parameter, 0)
+	parameters = append(parameters, m.PathParameters()...)
+	parameters = append(parameters, m.QueryParameters()...)
+	return parameters
 }
 
-// PathParamsFields returns path params fields.
-func (m *Method) PathParamsFields() Fields {
+// PathParameters returns path parameters with ref only.
+func (m *Method) PathParameters() []*ogen.Parameter {
+	pathParameters := make([]*ogen.Parameter, 0, len(m.PathParametersFields()))
+
+	for _, field := range m.PathParametersFields() {
+		ref := paramRef(field.Name.CamelCase())
+		pathParameters = append(pathParameters, ogen.NewParameter().SetRef(ref))
+	}
+
+	return pathParameters
+}
+
+// PathParametersFields returns path params fields.
+func (m *Method) PathParametersFields() Fields {
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isNotPathParam := func(pathName string) bool {
@@ -99,21 +107,21 @@ func (m *Method) PathParamsFields() Fields {
 	return fields
 }
 
-// QueryParams returns query parameters with ref only.
-func (m *Method) QueryParams() []*ogen.Parameter {
-	queryParams := make([]*ogen.Parameter, 0, len(m.QueryParamsFields()))
+// QueryParameters returns query parameters with ref only.
+func (m *Method) QueryParameters() []*ogen.Parameter {
+	queryParameters := make([]*ogen.Parameter, 0, len(m.QueryParametersFields()))
 
-	for _, field := range m.QueryParamsFields() {
+	for _, field := range m.QueryParametersFields() {
 		ref := paramRef(field.Name.CamelCase())
 		p := ogen.NewParameter().SetRef(ref)
-		queryParams = append(queryParams, p)
+		queryParameters = append(queryParameters, p)
 	}
 
-	return queryParams
+	return queryParameters
 }
 
-// QueryParamsFields returns query params fields.
-func (m *Method) QueryParamsFields() Fields {
+// QueryParametersFields returns query params fields.
+func (m *Method) QueryParametersFields() Fields {
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isPathParam := func(pathName string) bool {

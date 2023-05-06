@@ -112,12 +112,10 @@ func (g *Generator) addPath(m *Method) {
 }
 
 func (g *Generator) setGetOp(m *Method) {
-	g.addPathParams(m.PathParamsFields())
-	g.addQueryParams(m.QueryParamsFields())
+	g.addPathParameters(m.PathParametersFields())
+	g.addQueryParameters(m.QueryParametersFields())
 
-	op := m.Op().
-		AddParameters(m.PathParams()...).
-		AddParameters(m.QueryParams()...)
+	op := m.Op().SetParameters(m.Parameters())
 
 	if g.spec.Paths[m.Path()] == nil {
 		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetGet(op))
@@ -127,11 +125,11 @@ func (g *Generator) setGetOp(m *Method) {
 }
 
 func (g *Generator) setPutOp(m *Method) {
-	g.addPathParams(m.PathParamsFields())
+	g.addPathParameters(m.PathParametersFields())
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
 	op := m.Op().
-		AddParameters(m.PathParams()...).
+		SetParameters(m.PathParameters()).
 		SetRequestBody(reqBody)
 
 	if g.spec.Paths[m.Path()] == nil {
@@ -144,8 +142,7 @@ func (g *Generator) setPutOp(m *Method) {
 func (g *Generator) setPostOp(m *Method) {
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
-	op := m.Op().
-		SetRequestBody(reqBody)
+	op := m.Op().SetRequestBody(reqBody)
 
 	if g.spec.Paths[m.HTTPRule.Path] == nil {
 		g.spec.AddPathItem(m.HTTPRule.Path, ogen.NewPathItem().SetPost(op))
@@ -155,29 +152,29 @@ func (g *Generator) setPostOp(m *Method) {
 }
 
 func (g *Generator) setDeleteOp(m *Method) {
-	g.addPathParams(m.PathParamsFields())
+	g.addPathParameters(m.PathParametersFields())
 
-	op := m.Op().
-		AddParameters(m.PathParams()...)
+	op := m.Op().SetParameters(m.PathParameters())
 
-	if g.spec.Paths[m.HTTPRule.Path] == nil {
-		g.spec.AddPathItem(m.HTTPRule.Path, ogen.NewPathItem().SetDelete(op))
+	if g.spec.Paths[m.Path()] == nil {
+		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetDelete(op))
 	} else {
-		g.spec.Paths[m.HTTPRule.Path].SetDelete(op)
+		g.spec.Paths[m.Path()].SetDelete(op)
 	}
 }
 
 func (g *Generator) setPatchOp(m *Method) {
-	g.addPathParams(m.PathParamsFields())
+	g.addPathParameters(m.PathParametersFields())
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
 	op := m.Op().
-		AddParameters(m.PathParams()...).
+		SetParameters(m.PathParameters()).
 		SetRequestBody(reqBody)
-	if g.spec.Paths[m.HTTPRule.Path] == nil {
-		g.spec.AddPathItem(m.HTTPRule.Path, ogen.NewPathItem().SetPatch(op))
+
+	if g.spec.Paths[m.Path()] == nil {
+		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetPatch(op))
 	} else {
-		g.spec.Paths[m.HTTPRule.Path].SetPatch(op)
+		g.spec.Paths[m.Path()].SetPatch(op)
 	}
 }
 
@@ -221,29 +218,29 @@ func (g *Generator) mkReqBodyContent(path string, m *Message) map[string]ogen.Me
 	}
 }
 
-func (g *Generator) addPathParams(fs Fields) {
-	g.addParams("path", fs)
+func (g *Generator) addPathParameters(fs Fields) {
+	g.addParameters("path", fs)
 }
 
-func (g *Generator) addQueryParams(fs Fields) {
-	g.addParams("query", fs)
+func (g *Generator) addQueryParameters(fs Fields) {
+	g.addParameters("query", fs)
 }
 
-func (g *Generator) addParam(in string, f *Field) {
+func (g *Generator) addParameter(in string, f *Field) {
 	s := f.Type.Schema()
 	isRequired := !s.Nullable
-	param := ogen.NewParameter().
+	parameter := ogen.NewParameter().
 		SetIn(in).
 		SetName(f.Name.String()).
 		SetSchema(s).
 		SetRequired(isRequired)
 
-	g.spec.AddParameter(f.Name.CamelCase(), param)
+	g.spec.AddParameter(f.Name.CamelCase(), parameter)
 }
 
-func (g *Generator) addParams(in string, fs Fields) {
+func (g *Generator) addParameters(in string, fs Fields) {
 	for _, f := range fs {
-		g.addParam(in, f)
+		g.addParameter(in, f)
 	}
 }
 
