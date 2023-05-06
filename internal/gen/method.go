@@ -65,6 +65,7 @@ type Method struct {
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
 
+// Parameters returns path and query parameters.
 func (m *Method) Parameters() []*ogen.Parameter {
 	parameters := make([]*ogen.Parameter, 0)
 	parameters = append(parameters, m.PathParameters()...)
