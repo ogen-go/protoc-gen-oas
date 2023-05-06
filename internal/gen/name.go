@@ -1,4 +1,25 @@
-package naming
+package gen
+
+import (
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
+
+// NewName returns Name instance.
+func NewName(s string) Name { return Name(s) }
+
+// Name instance.
+type Name string
+
+// String implements fmt.Stringer.
+func (n Name) String() string { return string(n) }
+
+// LowerCamelCase returns lowerCamelCased Name.
+func (n Name) LowerCamelCase() string { return LowerCamelCase(n.String()) }
+
+// CamelCase returns CamelCased Name.
+func (n Name) CamelCase() string { return CamelCase(n.String()) }
 
 // Is c an ASCII lower-case letter?
 func isASCIILower(c byte) bool {
@@ -61,4 +82,32 @@ func CamelCase(s string) string {
 // LowerCamelCase returns the lowerCamelCased name.
 func LowerCamelCase(s string) string {
 	return Decapitalize(CamelCase(s))
+}
+
+// Capitalize converts first character to upper.
+//
+// If the string is invalid UTF-8 or empty, it is returned as is.
+func Capitalize(s string) string {
+	r, size := utf8.DecodeRuneInString(s)
+	if r == utf8.RuneError {
+		return s
+	}
+	return string(unicode.ToUpper(r)) + s[size:]
+}
+
+// Decapitalize converts first character to lower.
+//
+// If the string is invalid UTF-8 or empty, it is returned as is.
+func Decapitalize(s string) string {
+	r, size := utf8.DecodeRuneInString(s)
+	if r == utf8.RuneError {
+		return s
+	}
+	return string(unicode.ToLower(r)) + s[size:]
+}
+
+// LastAfterDots returns last word from string with word split dots.
+func LastAfterDots(s string) string {
+	words := strings.Split(s, ".")
+	return words[len(words)-1]
 }
