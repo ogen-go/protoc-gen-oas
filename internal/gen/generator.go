@@ -113,11 +113,11 @@ func (g *Generator) addPath(m *Method) {
 
 func (g *Generator) setGetOp(m *Method) {
 	g.addPathParams(m.PathParamsFields())
-	queryParams := g.mkQueryParams(m.Path(), m.Request)
+	g.addQueryParams(m.QueryParamsFields())
 
 	op := m.Op().
 		AddParameters(m.PathParams()...).
-		AddParameters(queryParams...)
+		AddParameters(m.QueryParams()...)
 
 	if g.spec.Paths[m.Path()] == nil {
 		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetGet(op))
@@ -221,32 +221,12 @@ func (g *Generator) mkReqBodyContent(path string, m *Message) map[string]ogen.Me
 	}
 }
 
-func (g *Generator) mkQueryParams(path string, m *Message) []*ogen.Parameter {
-	curlyBracketsWords := curlyBracketsWords(path)
-
-	isPathParam := func(pathName string) bool {
-		_, isPathParam := curlyBracketsWords[pathName]
-		return isPathParam
-	}
-
-	queryParams := make([]*ogen.Parameter, 0)
-
-	for _, field := range m.Fields {
-		if isPathParam(field.Name.String()) {
-			continue
-		}
-
-		ref := paramRef(field.Name.CamelCase())
-		queryParams = append(queryParams, ogen.NewParameter().SetRef(ref))
-
-		g.mkParam("query", field)
-	}
-
-	return queryParams
-}
-
 func (g *Generator) addPathParams(fs Fields) {
 	g.addParams("path", fs)
+}
+
+func (g *Generator) addQueryParams(fs Fields) {
+	g.addParams("query", fs)
 }
 
 func (g *Generator) addParam(in string, f *Field) {
@@ -265,18 +245,6 @@ func (g *Generator) addParams(in string, fs Fields) {
 	for _, f := range fs {
 		g.addParam(in, f)
 	}
-}
-
-func (g *Generator) mkParam(in string, f *Field) {
-	s := f.Type.Schema()
-	isRequired := !s.Nullable
-	param := ogen.NewParameter().
-		SetIn(in).
-		SetName(f.Name.String()).
-		SetSchema(s).
-		SetRequired(isRequired)
-
-	g.spec.AddParameter(f.Name.CamelCase(), param)
 }
 
 func (g *Generator) mkComponents() {

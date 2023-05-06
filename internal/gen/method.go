@@ -65,7 +65,7 @@ type Method struct {
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
 
-// PathParams returns parameters with ref only.
+// PathParams returns path parameters with ref only.
 func (m *Method) PathParams() []*ogen.Parameter {
 	pathParams := make([]*ogen.Parameter, 0, len(m.PathParamsFields()))
 
@@ -90,6 +90,41 @@ func (m *Method) PathParamsFields() Fields {
 
 	for _, field := range m.Request.Fields {
 		if isNotPathParam(field.Name.String()) {
+			continue
+		}
+
+		fields = append(fields, field)
+	}
+
+	return fields
+}
+
+// QueryParams returns query parameters with ref only.
+func (m *Method) QueryParams() []*ogen.Parameter {
+	queryParams := make([]*ogen.Parameter, 0, len(m.QueryParamsFields()))
+
+	for _, field := range m.QueryParamsFields() {
+		ref := paramRef(field.Name.CamelCase())
+		p := ogen.NewParameter().SetRef(ref)
+		queryParams = append(queryParams, p)
+	}
+
+	return queryParams
+}
+
+// QueryParamsFields returns query params fields.
+func (m *Method) QueryParamsFields() Fields {
+	curlyBracketsWords := curlyBracketsWords(m.Path())
+
+	isPathParam := func(pathName string) bool {
+		_, isPathParam := curlyBracketsWords[pathName]
+		return isPathParam
+	}
+
+	fields := make(Fields, 0)
+
+	for _, field := range m.Request.Fields {
+		if isPathParam(field.Name.String()) {
 			continue
 		}
 
