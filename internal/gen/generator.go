@@ -11,8 +11,6 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/yaml"
 	"github.com/ogen-go/ogen"
-
-	"github.com/ogen-go/protoc-gen-oas/internal/naming"
 )
 
 // ErrNoMethods reports that service have no methods.
@@ -334,7 +332,7 @@ func (g *Generator) mkPropertySchema(f *Field) *ogen.Schema {
 		s = f.Type.Schema()
 
 	case CardinalityRepeated:
-		n := naming.LastAfterDots(f.Type.Type)
+		n := LastAfterDots(f.Type.Type)
 		if resp, ok := g.spec.Components.Responses[n]; ok {
 			if c, ok := resp.Content["application/json"]; ok {
 				g.spec.AddSchema(n, c.Schema)
@@ -367,7 +365,7 @@ func schemaRef(s string) string {
 }
 
 func respRef(s string) string {
-	resp := naming.LastAfterDots(s)
+	resp := LastAfterDots(s)
 	return fmt.Sprintf("#/components/responses/%s", resp)
 }
 
