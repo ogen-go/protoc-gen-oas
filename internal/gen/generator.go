@@ -247,7 +247,6 @@ func (g *Generator) addParams(in string, fs Fields) {
 	}
 }
 
-
 func (g *Generator) mkComponents() {
 	g.mkResponses()
 }
