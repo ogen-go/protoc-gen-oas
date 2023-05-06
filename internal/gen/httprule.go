@@ -20,14 +20,10 @@ func NewHTTPRule(opts protoreflect.ProtoMessage) (*HTTPRule, error) {
 		return nil, err
 	}
 
-	m := method(httpRule)
-	p := path(httpRule)
-	b := httpRule.Body
-
 	return &HTTPRule{
-		Method: m,
-		Path:   p,
-		Body:   b,
+		Method: method(httpRule),
+		Path:   path(httpRule),
+		Body:   httpRule.Body,
 	}, nil
 }
 

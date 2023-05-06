@@ -1,3 +1,5 @@
+//go:generate stringer -type=Cardinality -linecomment
+
 package gen
 
 // Cardinality is field cardinality.
@@ -13,13 +15,13 @@ const (
 // NewCardinality returns Cardinality by string.
 func NewCardinality(c string) Cardinality {
 	switch c {
-	case "optional":
+	case CardinalityOptional.String():
 		return CardinalityOptional
 
-	case "required":
+	case CardinalityRequired.String():
 		return CardinalityRequired
 
-	case "repeated":
+	case CardinalityRepeated.String():
 		return CardinalityRepeated
 
 	default:
