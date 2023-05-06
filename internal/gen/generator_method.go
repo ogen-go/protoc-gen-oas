@@ -65,6 +65,40 @@ type Method struct {
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
 
+// PathParams returns parameters with ref only.
+func (m *Method) PathParams() []*ogen.Parameter {
+	pathParams := make([]*ogen.Parameter, 0, len(m.PathParamsFields()))
+
+	for _, field := range m.PathParamsFields() {
+		ref := paramRef(field.Name.CamelCase())
+		pathParams = append(pathParams, ogen.NewParameter().SetRef(ref))
+	}
+
+	return pathParams
+}
+
+// PathParamsFields returns path params fields.
+func (m *Method) PathParamsFields() Fields {
+	curlyBracketsWords := curlyBracketsWords(m.Path())
+
+	isNotPathParam := func(pathName string) bool {
+		_, isPathParam := curlyBracketsWords[pathName]
+		return !isPathParam
+	}
+
+	fields := make(Fields, 0, len(m.Request.Fields))
+
+	for _, field := range m.Request.Fields {
+		if isNotPathParam(field.Name.String()) {
+			continue
+		}
+
+		fields = append(fields, field)
+	}
+
+	return fields
+}
+
 // Op returns *ogen.Operation.
 func (m *Method) Op() *ogen.Operation {
 	respName := m.Response.Name.String()
