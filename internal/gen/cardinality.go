@@ -1,4 +1,4 @@
-//go:generate stringer -type=Cardinality -linecomment
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Cardinality -linecomment
 
 package gen
 
