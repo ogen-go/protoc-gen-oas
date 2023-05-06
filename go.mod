@@ -8,6 +8,7 @@ require (
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v0.67.0
 	github.com/stretchr/testify v1.8.2
+	golang.org/x/tools v0.8.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.30.0
 )
@@ -28,6 +29,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
+	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

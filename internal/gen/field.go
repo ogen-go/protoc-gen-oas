@@ -11,14 +11,10 @@ import (
 
 // NewField returns Field instance.
 func NewField(f *protogen.Field) (*Field, error) {
-	n := NewName(string(f.Desc.Name()))
-	c := NewCardinality(f.Desc.Cardinality().String())
-	t := NewFieldType(f.Desc)
-
 	return &Field{
-		Name:        n,
-		Cardinality: c,
-		Type:        t,
+		Name:        NewName(string(f.Desc.Name())),
+		Cardinality: NewCardinality(f.Desc.Cardinality().String()),
+		Type:        NewFieldType(f.Desc),
 	}, nil
 }
 
