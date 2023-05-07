@@ -197,23 +197,23 @@ func (g *Generator) mkReqBodyContent(path string, m *Message) map[string]ogen.Me
 		return isPathParam
 	}
 
-	props := make(ogen.Properties, 0, len(m.Fields))
+	properties := make(ogen.Properties, 0, len(m.Fields))
 	r := make([]string, 0)
 
-	for _, field := range m.Fields {
-		if isPathParam(field.Name.String()) {
+	for _, f := range m.Fields {
+		if isPathParam(f.Name.String()) {
 			continue
 		}
-		prop := g.mkProperty(field)
-		props = append(props, prop)
-		if !prop.Schema.Nullable {
-			r = append(r, field.Name.LowerCamelCase())
+		property := g.property(f)
+		properties = append(properties, property)
+		if f.Options.IsRequired {
+			r = append(r, f.Name.LowerCamelCase())
 		}
 	}
 
 	return map[string]ogen.Media{
 		"application/json": {
-			Schema: ogen.NewSchema().SetProperties(&props).SetRequired(r),
+			Schema: ogen.NewSchema().SetProperties(&properties).SetRequired(r),
 		},
 	}
 }
@@ -227,13 +227,11 @@ func (g *Generator) addQueryParameters(fs Fields) {
 }
 
 func (g *Generator) addParameter(in string, f *Field) {
-	s := f.Type.Schema()
-	isRequired := !s.Nullable
 	parameter := ogen.NewParameter().
 		SetIn(in).
 		SetName(f.Name.String()).
-		SetSchema(s).
-		SetRequired(isRequired)
+		SetSchema(f.Type.Schema()).
+		SetRequired(f.Options.IsRequired)
 
 	g.spec.AddParameter(f.Name.CamelCase(), parameter)
 }
@@ -262,10 +260,11 @@ func (g *Generator) mkResponse(m *Message) {
 	schema := ogen.NewSchema()
 	properties := make(ogen.Properties, 0, len(m.Fields))
 	r := make([]string, 0)
+
 	for _, f := range m.Fields {
-		prop := g.mkProperty(f)
-		properties = append(properties, prop)
-		if !prop.Schema.Nullable {
+		property := g.property(f)
+		properties = append(properties, property)
+		if f.Options.IsRequired {
 			r = append(r, f.Name.LowerCamelCase())
 		}
 	}
@@ -280,8 +279,8 @@ func (g *Generator) mkResponse(m *Message) {
 	)
 }
 
-func (g *Generator) mkProperty(f *Field) ogen.Property {
-	schema := g.mkPropertySchema(f)
+func (g *Generator) property(f *Field) ogen.Property {
+	schema := g.propertySchema(f)
 
 	return ogen.Property{
 		Name:   f.Name.LowerCamelCase(),
@@ -289,7 +288,7 @@ func (g *Generator) mkProperty(f *Field) ogen.Property {
 	}
 }
 
-func (g *Generator) mkPropertySchema(f *Field) *ogen.Schema {
+func (g *Generator) propertySchema(f *Field) *ogen.Schema {
 	s := ogen.NewSchema()
 
 	switch f.Cardinality {

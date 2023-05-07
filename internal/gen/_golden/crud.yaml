@@ -142,8 +142,6 @@ components:
                         properties:
                             name:
                                 type: string
-                        required:
-                            - name
         UpdateItemRequest:
             content:
                 application/json:

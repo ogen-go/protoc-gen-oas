@@ -3,7 +3,9 @@ package gen
 import (
 	"encoding/json"
 
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/ogen-go/ogen"
@@ -15,6 +17,7 @@ func NewField(f *protogen.Field) (*Field, error) {
 		Name:        NewName(string(f.Desc.Name())),
 		Cardinality: NewCardinality(f.Desc.Cardinality().String()),
 		Type:        NewFieldType(f.Desc),
+		Options:     NewFieldOptions(f.Desc.Options()),
 	}, nil
 }
 
@@ -39,6 +42,7 @@ type Field struct {
 	Name        Name
 	Cardinality Cardinality
 	Type        *FieldType
+	Options     *FieldOptions
 }
 
 // Fields is Field slice instance.
@@ -112,4 +116,31 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	}
 
 	return enum
+}
+
+// NewFieldOptions returns FieldOptions instance.
+func NewFieldOptions(opts protoreflect.ProtoMessage) *FieldOptions {
+	ext := proto.GetExtension(opts, annotations.E_FieldBehavior)
+	fieldBehaviors, ok := ext.([]annotations.FieldBehavior)
+	if !ok || fieldBehaviors == nil {
+		return &FieldOptions{}
+	}
+
+	isRequired := false
+
+	for _, fieldBehavior := range fieldBehaviors {
+		switch fieldBehavior {
+		case annotations.FieldBehavior_REQUIRED:
+			isRequired = true
+		}
+	}
+
+	return &FieldOptions{
+		IsRequired: isRequired,
+	}
+}
+
+// FieldOptions instance.
+type FieldOptions struct {
+	IsRequired bool
 }

@@ -6,14 +6,14 @@ import "google.golang.org/protobuf/compiler/protogen"
 func NewService(s *protogen.Service) (*Service, error) {
 	n := string(s.Desc.Name())
 
-	m, err := NewMethods(s.Methods)
+	methods, err := NewMethods(s.Methods)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
 		Name:    n,
-		Methods: m,
+		Methods: methods,
 	}, nil
 }
 

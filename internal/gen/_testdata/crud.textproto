@@ -9,6 +9,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -19,6 +22,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
     field: {
       name: "name"
@@ -26,6 +32,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -36,6 +45,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_INT32
       json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
     field: {
       name: "offset"
@@ -43,6 +55,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_INT32
       json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -53,6 +68,9 @@ proto_file: {
       label: LABEL_REPEATED
       type_name: "Item"
       json_name: "items"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
     field: {
       name: "total_count"
@@ -60,6 +78,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_INT32
       json_name: "totalCount"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -70,6 +91,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -80,6 +104,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
     field: {
       name: "name"
@@ -87,6 +114,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {
@@ -97,6 +127,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
     field: {
       name: "name"
@@ -114,6 +147,9 @@ proto_file: {
       label: LABEL_OPTIONAL
       type: TYPE_STRING
       json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
     }
   }
   message_type: {

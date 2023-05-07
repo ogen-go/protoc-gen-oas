@@ -25,7 +25,6 @@ components:
         Id:
             name: id
             in: path
-            required: true
             schema:
                 type: string
     requestBodies:
@@ -37,5 +36,3 @@ components:
                         properties:
                             body:
                                 type: string
-                        required:
-                            - body

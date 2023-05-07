@@ -167,9 +167,6 @@ components:
                                     - ITEM_TYPE_BASIC
                             name:
                                 type: string
-                        required:
-                            - type
-                            - name
         UpdateItemRequest:
             content:
                 application/json:

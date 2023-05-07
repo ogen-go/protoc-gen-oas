@@ -5,6 +5,7 @@ package service.v1;
 option go_package = "service/v1;service";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 service Service {
@@ -45,44 +46,44 @@ service Service {
 }
 
 message CreateItemRequest {
-    string name = 1;
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message Item {
-    string id = 1;
-    ItemType type = 2;
-    string name = 3;
-    google.protobuf.Timestamp created_at = 4;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+    ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
+    string name = 3 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetItemsRequest {
-    int32 limit = 1;
-    int32 offset = 2;
+    int32 limit = 1 [(google.api.field_behavior) = REQUIRED];
+    int32 offset = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetItemsResponse {
-    repeated Item items = 1;
-    int32 total_count = 2;
+    repeated Item items = 1 [(google.api.field_behavior) = REQUIRED];
+    int32 total_count = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetItemRequest {
-    string id = 1;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message UpdateItemRequest {
-    string id = 1;
-    ItemType type = 2;
-    string name = 3;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+    ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
+    string name = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message PatchItemRequest {
-    string id = 1;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
     ItemType type = 2;
     string name = 3;
 }
 
 message DeleteItemRequest {
-    string id = 1;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message Empty {}
