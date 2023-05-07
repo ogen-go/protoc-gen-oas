@@ -5,6 +5,7 @@ package service.v1;
 option go_package = "service/v1;service";
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 service Service {
     rpc CreateItem(CreateItemRequest) returns (Item) {
@@ -51,6 +52,7 @@ message Item {
     string id = 1;
     ItemType type = 2;
     string name = 3;
+    google.protobuf.Timestamp created_at = 4;
 }
 
 message GetItemsRequest {

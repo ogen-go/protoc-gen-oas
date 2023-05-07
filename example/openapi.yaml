@@ -66,10 +66,14 @@ components:
                         - ITEM_TYPE_BASIC
                 name:
                     type: string
+                createdAt:
+                    type: string
+                    format: date-time
             required:
                 - id
                 - type
                 - name
+                - createdAt
     responses:
         Empty:
             description: Empty
@@ -110,10 +114,14 @@ components:
                                     - ITEM_TYPE_BASIC
                             name:
                                 type: string
+                            createdAt:
+                                type: string
+                                format: date-time
                         required:
                             - id
                             - type
                             - name
+                            - createdAt
     parameters:
         Id:
             name: id
