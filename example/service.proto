@@ -49,7 +49,8 @@ message CreateItemRequest {
 
 message Item {
     string id = 1;
-    string name = 2;
+    ItemType type = 2;
+    string name = 3;
 }
 
 message GetItemsRequest {
@@ -68,12 +69,14 @@ message GetItemRequest {
 
 message UpdateItemRequest {
     string id = 1;
-    string name = 2;
+    ItemType type = 2;
+    string name = 3;
 }
 
 message PatchItemRequest {
     string id = 1;
-    string name = 2;
+    ItemType type = 2;
+    string name = 3;
 }
 
 message DeleteItemRequest {
@@ -81,3 +84,8 @@ message DeleteItemRequest {
 }
 
 message Empty {}
+
+enum ItemType {
+    ITEM_TYPE_UNSPECIFIED = 0;
+    ITEM_TYPE_BASIC = 1;
+}

@@ -59,10 +59,16 @@ components:
             properties:
                 id:
                     type: string
+                type:
+                    type: string
+                    enum:
+                        - ITEM_TYPE_UNSPECIFIED
+                        - ITEM_TYPE_BASIC
                 name:
                     type: string
             required:
                 - id
+                - type
                 - name
     responses:
         Empty:
@@ -97,10 +103,16 @@ components:
                         properties:
                             id:
                                 type: string
+                            type:
+                                type: string
+                                enum:
+                                    - ITEM_TYPE_UNSPECIFIED
+                                    - ITEM_TYPE_BASIC
                             name:
                                 type: string
                         required:
                             - id
+                            - type
                             - name
     parameters:
         Id:
@@ -140,9 +152,15 @@ components:
                     schema:
                         type: object
                         properties:
+                            type:
+                                type: string
+                                enum:
+                                    - ITEM_TYPE_UNSPECIFIED
+                                    - ITEM_TYPE_BASIC
                             name:
                                 type: string
                         required:
+                            - type
                             - name
         UpdateItemRequest:
             content:
@@ -150,7 +168,13 @@ components:
                     schema:
                         type: object
                         properties:
+                            type:
+                                type: string
+                                enum:
+                                    - ITEM_TYPE_UNSPECIFIED
+                                    - ITEM_TYPE_BASIC
                             name:
                                 type: string
                         required:
+                            - type
                             - name
