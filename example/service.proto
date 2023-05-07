@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+
+service Service {
+    rpc CreateItem(CreateItemRequest) returns (Item) {
+        option (google.api.http) = {
+            post: "/api/v1/items"
+            body: "*"
+        };
+    }
+    rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/items"
+        };
+    }
+    rpc GetItem(GetItemRequest) returns (Item) {
+        option (google.api.http) = {
+            get: "/api/v1/items/{id}"
+        };
+    }
+    rpc UpdateItem(UpdateItemRequest) returns (Item) {
+        option (google.api.http) = {
+            put: "/api/v1/items/{id}"
+            body: "*"
+        };
+    }
+    rpc PatchItem(PatchItemRequest) returns (Item) {
+        option (google.api.http) = {
+            patch: "/api/v1/items/{id}"
+            body: "*"
+        };
+    }
+    rpc DeleteItem(DeleteItemRequest) returns (Empty) {
+        option (google.api.http) = {
+            delete: "/api/v1/items/{id}"
+            body: "*"
+        };
+    }
+}
+
+message CreateItemRequest {
+    string name = 1;
+}
+
+message Item {
+    string id = 1;
+    string name = 2;
+}
+
+message GetItemsRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message GetItemsResponse {
+    repeated Item items = 1;
+    int32 total_count = 2;
+}
+
+message GetItemRequest {
+    string id = 1;
+}
+
+message UpdateItemRequest {
+    string id = 1;
+    string name = 2;
+}
+
+message PatchItemRequest {
+    string id = 1;
+    string name = 2;
+}
+
+message DeleteItemRequest {
+    string id = 1;
+}
+
+message Empty {}
