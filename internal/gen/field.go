@@ -66,7 +66,7 @@ func NewFieldType(fd protoreflect.FieldDescriptor) *FieldType {
 		return &FieldType{Type: "number", Format: "double"}
 
 	case "enum":
-		return &FieldType{Type: "string", Enum: fd.Enum()}
+		return &FieldType{Type: "string", Enum: enum(fd.Enum())}
 
 	case "int32":
 		return &FieldType{Type: "integer", Format: "int32"}
@@ -90,7 +90,12 @@ type FieldType struct {
 	Type   string
 	Format string
 	Null   bool
-	Enum   protoreflect.EnumDescriptor
+	Enum   []json.RawMessage
+}
+
+// HasEnum returns true if FieldType have Enum.
+func (ft *FieldType) HasEnum() bool {
+	return len(ft.Enum) > 0
 }
 
 // Schema returns *ogen.Schema filled by FieldType.
@@ -99,7 +104,7 @@ func (ft *FieldType) Schema() *ogen.Schema {
 		SetType(ft.Type).
 		SetFormat(ft.Format).
 		SetNullable(ft.Null).
-		SetEnum(enum(ft.Enum))
+		SetEnum(ft.Enum)
 }
 
 func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {

@@ -91,9 +91,7 @@ func (g *Generator) setPaths() {
 func (g *Generator) addPath(m *Method) {
 	g.responses[m.Response.Name.String()] = struct{}{}
 
-	r := m.HTTPRule
-
-	switch r.Method {
+	switch m.HTTPRule.Method {
 	case http.MethodGet:
 		g.setGetOp(m)
 
@@ -293,7 +291,12 @@ func (g *Generator) propertySchema(f *Field) *ogen.Schema {
 
 	switch f.Cardinality {
 	case CardinalityOptional:
-		s = f.Type.Schema()
+		if f.Type.HasEnum() {
+			g.spec.AddSchema(f.Name.CamelCase(), f.Type.Schema())
+			s.SetRef(schemaRef(f.Name.CamelCase()))
+		} else {
+			s = f.Type.Schema()
+		}
 
 	case CardinalityRepeated:
 		n := LastAfterDots(f.Type.Type)
