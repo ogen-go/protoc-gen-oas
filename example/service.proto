@@ -5,6 +5,7 @@ package service.v1;
 option go_package = "service/v1;service";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 import "message.proto";
 
 service Service {
@@ -36,7 +37,7 @@ service Service {
             body: "*"
         };
     }
-    rpc DeleteItem(DeleteItemRequest) returns (Empty) {
+    rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/api/v1/items/{id}"
             body: "*"

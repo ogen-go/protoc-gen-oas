@@ -48,8 +48,6 @@ message DeleteItemRequest {
   string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-message Empty {}
-
 enum ItemType {
   ITEM_TYPE_UNSPECIFIED = 0;
   ITEM_TYPE_BASIC = 1;

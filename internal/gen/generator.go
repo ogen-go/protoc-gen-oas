@@ -25,16 +25,28 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 		return nil, err
 	}
 
+	messages := make(map[string]struct{})
+
 	for _, f := range fs {
 		if isSkip := !f.Generate; isSkip {
 			continue
 		}
 
 		for _, service := range f.Services {
-			g.methods = append(g.methods, service.Methods...)
+			for _, method := range service.Methods {
+				g.methods = append(g.methods, method)
+				messages[method.Response.Name.String()] = struct{}{}
+				messages[method.Request.Name.String()] = struct{}{}
+			}
 		}
+	}
 
-		g.messages = append(g.messages, f.Messages...)
+	for _, f := range fs {
+		for _, message := range f.Messages {
+			if _, ok := messages[message.Name.String()]; ok {
+				g.messages = append(g.messages, message)
+			}
+		}
 	}
 
 	if len(g.methods) == 0 {
