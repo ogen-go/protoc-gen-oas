@@ -7,7 +7,11 @@ paths:
         put:
             operationId: putMethod
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 $ref: '#/components/requestBodies/Request'
             responses:
@@ -21,13 +25,6 @@ components:
                 application/json:
                     schema:
                         type: object
-    parameters:
-        Id:
-            name: id
-            in: path
-            required: true
-            schema:
-                type: string
     requestBodies:
         Request:
             content:
