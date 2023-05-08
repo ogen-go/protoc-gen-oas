@@ -45,6 +45,15 @@ type Field struct {
 	Options     *FieldOptions
 }
 
+// AsParameter creates a new Parameter for this field.
+func (f *Field) AsParameter(in string) *ogen.Parameter {
+	return ogen.NewParameter().
+		SetIn(in).
+		SetName(f.Name.String()).
+		SetSchema(f.Type.Schema()).
+		SetRequired(f.Options.IsRequired || in == "path")
+}
+
 // Fields is Field slice instance.
 type Fields []*Field
 

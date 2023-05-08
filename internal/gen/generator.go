@@ -122,9 +122,6 @@ func (g *Generator) addPath(m *Method) {
 }
 
 func (g *Generator) setGetOp(m *Method) {
-	g.addPathParameters(m.PathParametersFields())
-	g.addQueryParameters(m.QueryParametersFields())
-
 	op := m.Op().SetParameters(m.Parameters())
 
 	if g.spec.Paths[m.Path()] == nil {
@@ -135,7 +132,6 @@ func (g *Generator) setGetOp(m *Method) {
 }
 
 func (g *Generator) setPutOp(m *Method) {
-	g.addPathParameters(m.PathParametersFields())
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
 	op := m.Op().
@@ -162,8 +158,6 @@ func (g *Generator) setPostOp(m *Method) {
 }
 
 func (g *Generator) setDeleteOp(m *Method) {
-	g.addPathParameters(m.PathParametersFields())
-
 	op := m.Op().SetParameters(m.PathParameters())
 
 	if g.spec.Paths[m.Path()] == nil {
@@ -174,7 +168,6 @@ func (g *Generator) setDeleteOp(m *Method) {
 }
 
 func (g *Generator) setPatchOp(m *Method) {
-	g.addPathParameters(m.PathParametersFields())
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
 	op := m.Op().
@@ -225,30 +218,6 @@ func (g *Generator) mkReqBodyContent(path string, m *Message) map[string]ogen.Me
 		"application/json": {
 			Schema: ogen.NewSchema().SetProperties(&properties).SetRequired(r),
 		},
-	}
-}
-
-func (g *Generator) addPathParameters(fs Fields) {
-	g.addParameters("path", fs)
-}
-
-func (g *Generator) addQueryParameters(fs Fields) {
-	g.addParameters("query", fs)
-}
-
-func (g *Generator) addParameter(in string, f *Field) {
-	parameter := ogen.NewParameter().
-		SetIn(in).
-		SetName(f.Name.String()).
-		SetSchema(f.Type.Schema()).
-		SetRequired(f.Options.IsRequired || in == "path")
-
-	g.spec.AddParameter(f.Name.CamelCase(), parameter)
-}
-
-func (g *Generator) addParameters(in string, fs Fields) {
-	for _, f := range fs {
-		g.addParameter(in, f)
 	}
 }
 

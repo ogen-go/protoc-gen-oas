@@ -74,19 +74,7 @@ func (m *Method) Parameters() []*ogen.Parameter {
 }
 
 // PathParameters returns path parameters with ref only.
-func (m *Method) PathParameters() []*ogen.Parameter {
-	pathParameters := make([]*ogen.Parameter, 0, len(m.PathParametersFields()))
-
-	for _, field := range m.PathParametersFields() {
-		ref := paramRef(field.Name.CamelCase())
-		pathParameters = append(pathParameters, ogen.NewParameter().SetRef(ref))
-	}
-
-	return pathParameters
-}
-
-// PathParametersFields returns path params fields.
-func (m *Method) PathParametersFields() Fields {
+func (m *Method) PathParameters() (params []*ogen.Parameter) {
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isNotPathParam := func(pathName string) bool {
@@ -94,34 +82,18 @@ func (m *Method) PathParametersFields() Fields {
 		return !isPathParam
 	}
 
-	fields := make(Fields, 0, len(m.Request.Fields))
-
 	for _, field := range m.Request.Fields {
 		if isNotPathParam(field.Name.String()) {
 			continue
 		}
-
-		fields = append(fields, field)
+		params = append(params, field.AsParameter("path"))
 	}
 
-	return fields
+	return params
 }
 
 // QueryParameters returns query parameters with ref only.
-func (m *Method) QueryParameters() []*ogen.Parameter {
-	queryParameters := make([]*ogen.Parameter, 0, len(m.QueryParametersFields()))
-
-	for _, field := range m.QueryParametersFields() {
-		ref := paramRef(field.Name.CamelCase())
-		p := ogen.NewParameter().SetRef(ref)
-		queryParameters = append(queryParameters, p)
-	}
-
-	return queryParameters
-}
-
-// QueryParametersFields returns query params fields.
-func (m *Method) QueryParametersFields() Fields {
+func (m *Method) QueryParameters() (params []*ogen.Parameter) {
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isPathParam := func(pathName string) bool {
@@ -129,17 +101,14 @@ func (m *Method) QueryParametersFields() Fields {
 		return isPathParam
 	}
 
-	fields := make(Fields, 0)
-
 	for _, field := range m.Request.Fields {
 		if isPathParam(field.Name.String()) {
 			continue
 		}
-
-		fields = append(fields, field)
+		params = append(params, field.AsParameter("query"))
 	}
 
-	return fields
+	return params
 }
 
 // Op returns *ogen.Operation.
