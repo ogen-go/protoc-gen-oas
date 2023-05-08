@@ -1,0 +1,67 @@
+proto_file: {
+  name: "service.proto"
+  package: "service.v1"
+  message_type: {
+    name: "FooRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+    field: {
+      name: "query"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "query"
+    }
+  }
+  message_type: {
+    name: "BarRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_INT64
+      json_name: "id"
+    }
+    field: {
+      name: "query"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "query"
+    }
+  }
+  message_type: {
+    name: "Response"
+  }
+  service: {
+    name: "Service"
+    method: {
+      name: "FooMethod"
+      input_type: "FooRequest"
+      output_type: "Response"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/foo/{id}"
+        }
+      }
+    }
+    method: {
+      name: "BarMethod"
+      input_type: "BarRequest"
+      output_type: "Response"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/bar/{query}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}
