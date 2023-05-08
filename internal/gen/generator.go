@@ -241,7 +241,7 @@ func (g *Generator) addParameter(in string, f *Field) {
 		SetIn(in).
 		SetName(f.Name.String()).
 		SetSchema(f.Type.Schema()).
-		SetRequired(f.Options.IsRequired)
+		SetRequired(f.Options.IsRequired || in == "path")
 
 	g.spec.AddParameter(f.Name.CamelCase(), parameter)
 }
