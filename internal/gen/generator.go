@@ -34,7 +34,7 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 			g.methods = append(g.methods, service.Methods...)
 		}
 
-		g.messages = append(g.messages, f.Mesagges...)
+		g.messages = append(g.messages, f.Messages...)
 	}
 
 	if len(g.methods) == 0 {

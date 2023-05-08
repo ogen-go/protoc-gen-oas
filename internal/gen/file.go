@@ -17,7 +17,7 @@ func NewFile(f *protogen.File) (*File, error) {
 	return &File{
 		Generate: f.Generate,
 		Services: ss,
-		Mesagges: ms,
+		Messages: ms,
 	}, nil
 }
 
@@ -41,7 +41,7 @@ func NewFiles(fs []*protogen.File) (Files, error) {
 type File struct {
 	Generate bool
 	Services Services
-	Mesagges Messages
+	Messages Messages
 }
 
 // Files is File slice instance.
