@@ -7,8 +7,18 @@ paths:
         get:
             operationId: getItems
             parameters:
-                -   $ref: '#/components/parameters/Limit'
-                -   $ref: '#/components/parameters/Offset'
+                -   name: limit
+                    in: query
+                    required: true
+                    schema:
+                        type: integer
+                        format: int32
+                -   name: offset
+                    in: query
+                    required: true
+                    schema:
+                        type: integer
+                        format: int32
             responses:
                 "200":
                     $ref: '#/components/responses/GetItemsResponse'
@@ -23,14 +33,22 @@ paths:
         get:
             operationId: getItem
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             responses:
                 "200":
                     $ref: '#/components/responses/Item'
         put:
             operationId: updateItem
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 $ref: '#/components/requestBodies/UpdateItemRequest'
             responses:
@@ -39,14 +57,22 @@ paths:
         delete:
             operationId: deleteItem
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             responses:
                 "200":
                     $ref: '#/components/responses/Empty'
         patch:
             operationId: patchItem
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 $ref: '#/components/requestBodies/PatchItemRequest'
             responses:
@@ -121,27 +147,6 @@ components:
                             - type
                             - name
                             - createdAt
-    parameters:
-        Id:
-            name: id
-            in: path
-            required: true
-            schema:
-                type: string
-        Limit:
-            name: limit
-            in: query
-            required: true
-            schema:
-                type: integer
-                format: int32
-        Offset:
-            name: offset
-            in: query
-            required: true
-            schema:
-                type: integer
-                format: int32
     requestBodies:
         CreateItemRequest:
             content:

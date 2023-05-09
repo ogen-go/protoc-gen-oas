@@ -80,6 +80,9 @@ func NewFieldType(fd protoreflect.FieldDescriptor) *FieldType {
 	case "int32":
 		return &FieldType{Type: "integer", Format: "int32"}
 
+	case "int64":
+		return &FieldType{Type: "integer", Format: "int64"}
+
 	case "google.protobuf.DoubleValue":
 		return &FieldType{Type: "number", Format: "double", Null: true}
 

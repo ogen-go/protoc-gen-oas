@@ -15,7 +15,8 @@ paths:
                 -   name: id
                     in: query
                     schema:
-                        type: int64
+                        type: integer
+                        format: int64
             responses:
                 "200":
                     $ref: '#/components/responses/Response'
