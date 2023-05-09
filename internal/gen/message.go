@@ -6,10 +6,7 @@ import "google.golang.org/protobuf/compiler/protogen"
 func NewMessage(m *protogen.Message) (*Message, error) {
 	n := NewName(string(m.Desc.Name()))
 
-	fs, err := NewFields(m.Fields)
-	if err != nil {
-		return nil, err
-	}
+	fs := NewFields(m.Fields)
 
 	return &Message{
 		Name:   n,
