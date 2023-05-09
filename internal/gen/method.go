@@ -68,6 +68,7 @@ func (m *Method) Path() string { return m.HTTPRule.Path }
 // Body returns HTTPRule.Body.
 func (m *Method) Body() string { return m.HTTPRule.Body }
 
+// Request returns request data by Body data.
 func (m *Method) Request() *Message {
 	if m.Body() == "" || m.Body() == "*" {
 		return m.request
