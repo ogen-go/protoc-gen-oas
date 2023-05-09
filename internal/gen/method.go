@@ -68,13 +68,12 @@ func (m *Method) Path() string { return m.HTTPRule.Path }
 // Parameters returns path and query parameters.
 func (m *Method) Parameters() []*ogen.Parameter {
 	parameters := make([]*ogen.Parameter, 0)
-	parameters = append(parameters, m.PathParameters()...)
-	parameters = append(parameters, m.QueryParameters()...)
+	parameters = append(parameters, m.pathParameters()...)
+	parameters = append(parameters, m.queryParameters()...)
 	return parameters
 }
 
-// PathParameters returns path parameters with ref only.
-func (m *Method) PathParameters() (params []*ogen.Parameter) {
+func (m *Method) pathParameters() (params []*ogen.Parameter) {
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isNotPathParam := func(pathName string) bool {
@@ -92,8 +91,11 @@ func (m *Method) PathParameters() (params []*ogen.Parameter) {
 	return params
 }
 
-// QueryParameters returns query parameters with ref only.
-func (m *Method) QueryParameters() (params []*ogen.Parameter) {
+func (m *Method) queryParameters() (params []*ogen.Parameter) {
+	if m.HTTPRule.Body == "*" {
+		return params
+	}
+
 	curlyBracketsWords := curlyBracketsWords(m.Path())
 
 	isPathParam := func(pathName string) bool {
@@ -102,7 +104,8 @@ func (m *Method) QueryParameters() (params []*ogen.Parameter) {
 	}
 
 	for _, field := range m.Request.Fields {
-		if isPathParam(field.Name.String()) {
+		isBodyParam := m.HTTPRule.Body == field.Name.String()
+		if isPathParam(field.Name.String()) || isBodyParam {
 			continue
 		}
 		params = append(params, field.AsParameter("query"))
