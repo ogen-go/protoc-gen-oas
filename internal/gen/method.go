@@ -8,12 +8,7 @@ import (
 )
 
 // NewMethod returns Method instance.
-func NewMethod(m *protogen.Method) (*Method, error) {
-	httpRule, err := NewHTTPRule(m.Desc.Options())
-	if err != nil {
-		return nil, err
-	}
-
+func NewMethod(httpRule *HTTPRule, m *protogen.Method) (*Method, error) {
 	n := string(m.Desc.Name())
 
 	req, err := NewMessage(m.Input)
@@ -39,15 +34,23 @@ func NewMethods(ms []*protogen.Method) (Methods, error) {
 	methods := make(Methods, 0, len(ms))
 
 	for _, m := range ms {
-		switch method, err := NewMethod(m); {
-		case err == nil: // if NO error
-			methods = append(methods, method)
-
-		case errors.Is(err, ErrNotImplHTTPRule):
-			// skip
-
-		default:
+		httpRules, err := NewHTTPRule(m.Desc.Options())
+		if err != nil {
 			return nil, err
+		}
+		switch {
+		case errors.Is(err, ErrNotImplHTTPRule): // skip
+			continue
+		case err != nil: // if error
+			return nil, err
+		}
+
+		for _, httpRule := range httpRules {
+			method, err := NewMethod(httpRule, m)
+			if err != nil {
+				return nil, err
+			}
+			methods = append(methods, method)
 		}
 	}
 
