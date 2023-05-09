@@ -122,19 +122,17 @@ func (g *Generator) addPath(m *Method) {
 }
 
 func (g *Generator) setGetOp(m *Method) {
-	op := m.Op().SetParameters(m.Parameters())
-
 	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetGet(op))
+		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetGet(m.Op()))
 	} else {
-		g.spec.Paths[m.Path()].SetGet(op)
+		g.spec.Paths[m.Path()].SetGet(m.Op())
 	}
 }
 
 func (g *Generator) setPutOp(m *Method) {
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
-	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
+	op := m.Op().SetRequestBody(reqBody)
 
 	if g.spec.Paths[m.Path()] == nil {
 		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetPut(op))
@@ -146,7 +144,7 @@ func (g *Generator) setPutOp(m *Method) {
 func (g *Generator) setPostOp(m *Method) {
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
-	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
+	op := m.Op().SetRequestBody(reqBody)
 
 	if g.spec.Paths[m.HTTPRule.Path] == nil {
 		g.spec.AddPathItem(m.HTTPRule.Path, ogen.NewPathItem().SetPost(op))
@@ -156,19 +154,17 @@ func (g *Generator) setPostOp(m *Method) {
 }
 
 func (g *Generator) setDeleteOp(m *Method) {
-	op := m.Op().SetParameters(m.Parameters())
-
 	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetDelete(op))
+		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetDelete(m.Op()))
 	} else {
-		g.spec.Paths[m.Path()].SetDelete(op)
+		g.spec.Paths[m.Path()].SetDelete(m.Op())
 	}
 }
 
 func (g *Generator) setPatchOp(m *Method) {
 	reqBody := g.mkReqBody(m.Path(), m.Request)
 
-	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
+	op := m.Op().SetRequestBody(reqBody)
 
 	if g.spec.Paths[m.Path()] == nil {
 		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetPatch(op))
