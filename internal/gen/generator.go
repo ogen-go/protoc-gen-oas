@@ -36,7 +36,7 @@ func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Genera
 			for _, method := range service.Methods {
 				g.methods = append(g.methods, method)
 				messages[method.Response.Name.String()] = struct{}{}
-				messages[method.Request.Name.String()] = struct{}{}
+				messages[method.Request().Name.String()] = struct{}{}
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func (g *Generator) setGetOp(m *Method) {
 }
 
 func (g *Generator) setPutOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request)
+	reqBody := g.mkReqBody(m.Path(), m.Request())
 
 	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
 
@@ -144,7 +144,7 @@ func (g *Generator) setPutOp(m *Method) {
 }
 
 func (g *Generator) setPostOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request)
+	reqBody := g.mkReqBody(m.Path(), m.Request())
 
 	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
 
@@ -166,7 +166,7 @@ func (g *Generator) setDeleteOp(m *Method) {
 }
 
 func (g *Generator) setPatchOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request)
+	reqBody := g.mkReqBody(m.Path(), m.Request())
 
 	op := m.Op().SetParameters(m.Parameters()).SetRequestBody(reqBody)
 
@@ -179,7 +179,7 @@ func (g *Generator) setPatchOp(m *Method) {
 
 func (g *Generator) mkReqBody(path string, m *Message) *ogen.RequestBody {
 	ref := reqBodyRef(m.Name.CamelCase())
-	g.spec.AddRequestBody(m.Name.String(), ogen.NewRequestBody().SetContent(g.mkReqBodyContent(path, m)))
+	g.spec.AddRequestBody(m.Name.CamelCase(), ogen.NewRequestBody().SetContent(g.mkReqBodyContent(path, m)))
 	return ogen.NewRequestBody().SetRef(ref)
 }
 
@@ -311,10 +311,6 @@ func schemaRef(s string) string {
 func respRef(s string) string {
 	resp := LastAfterDots(s)
 	return fmt.Sprintf("#/components/responses/%s", resp)
-}
-
-func paramRef(s string) string {
-	return fmt.Sprintf("#/components/parameters/%s", s)
 }
 
 func reqBodyRef(s string) string {

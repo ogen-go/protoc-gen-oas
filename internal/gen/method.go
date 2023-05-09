@@ -29,7 +29,7 @@ func NewMethod(m *protogen.Method) (*Method, error) {
 	return &Method{
 		Name:     NewName(n),
 		HTTPRule: httpRule,
-		Request:  req,
+		request:  req,
 		Response: resp,
 	}, nil
 }
@@ -58,12 +58,36 @@ func NewMethods(ms []*protogen.Method) (Methods, error) {
 type Method struct {
 	Name     Name
 	HTTPRule *HTTPRule
-	Request  *Message
+	request  *Message
 	Response *Message
 }
 
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
+
+// Body returns HTTPRule.Body.
+func (m *Method) Body() string { return m.HTTPRule.Body }
+
+func (m *Method) Request() *Message {
+	if m.Body() == "" || m.Body() == "*" {
+		return m.request
+	}
+
+	var msg *Message
+
+	for _, field := range m.request.Fields {
+		if field.Name.String() == m.Body() {
+			msg = &Message{
+				Name:   NewName(m.Body()),
+				Fields: []*Field{field},
+			}
+
+			break
+		}
+	}
+
+	return msg
+}
 
 // Parameters returns path and query parameters.
 func (m *Method) Parameters() []*ogen.Parameter {
@@ -81,7 +105,7 @@ func (m *Method) pathParameters() (params []*ogen.Parameter) {
 		return !isPathParam
 	}
 
-	for _, field := range m.Request.Fields {
+	for _, field := range m.request.Fields {
 		if isNotPathParam(field.Name.String()) {
 			continue
 		}
@@ -103,7 +127,7 @@ func (m *Method) queryParameters() (params []*ogen.Parameter) {
 		return isPathParam
 	}
 
-	for _, field := range m.Request.Fields {
+	for _, field := range m.request.Fields {
 		isBodyParam := m.HTTPRule.Body == field.Name.String()
 		if isPathParam(field.Name.String()) || isBodyParam {
 			continue
