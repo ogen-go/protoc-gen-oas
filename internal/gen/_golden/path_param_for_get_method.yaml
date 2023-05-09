@@ -7,7 +7,11 @@ paths:
         get:
             operationId: getMethod
             parameters:
-                -   $ref: '#/components/parameters/Id'
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
             responses:
                 "200":
                     $ref: '#/components/responses/Response'
@@ -19,10 +23,3 @@ components:
                 application/json:
                     schema:
                         type: object
-    parameters:
-        Id:
-            name: id
-            in: path
-            required: true
-            schema:
-                type: string

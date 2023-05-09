@@ -3,9 +3,25 @@ info:
     title: ""
     version: ""
 paths:
-    /api/v1/{id}:
+    /api/v1/bar/{query}:
         get:
-            operationId: getMethod
+            operationId: barMethod
+            parameters:
+                -   name: query
+                    in: path
+                    required: true
+                    schema:
+                        type: string
+                -   name: id
+                    in: query
+                    schema:
+                        type: int64
+            responses:
+                "200":
+                    $ref: '#/components/responses/Response'
+    /api/v1/foo/{id}:
+        get:
+            operationId: fooMethod
             parameters:
                 -   name: id
                     in: path
