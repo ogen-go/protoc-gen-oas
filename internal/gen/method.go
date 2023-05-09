@@ -65,8 +65,8 @@ type Method struct {
 // Path returns HTTPRule.Path.
 func (m *Method) Path() string { return m.HTTPRule.Path }
 
-// Parameters returns path and query parameters.
-func (m *Method) Parameters() []*ogen.Parameter {
+// parameters returns path and query parameters.
+func (m *Method) parameters() []*ogen.Parameter {
 	parameters := make([]*ogen.Parameter, 0)
 	parameters = append(parameters, m.pathParameters()...)
 	parameters = append(parameters, m.queryParameters()...)
@@ -121,6 +121,7 @@ func (m *Method) Op() *ogen.Operation {
 
 	return ogen.NewOperation().
 		SetOperationID(m.Name.LowerCamelCase()).
+		SetParameters(m.parameters()).
 		SetResponses(ogen.Responses{
 			"200": ogen.NewResponse().SetRef(ref),
 		})
