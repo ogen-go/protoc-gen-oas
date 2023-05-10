@@ -8,7 +8,7 @@ require (
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v0.67.0
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/tools v0.9.0
+	golang.org/x/tools v0.9.1
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.30.0
 )
