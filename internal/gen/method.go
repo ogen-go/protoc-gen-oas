@@ -1,6 +1,8 @@
 package gen
 
 import (
+	"strings"
+
 	"google.golang.org/protobuf/compiler/protogen"
 
 	"github.com/go-faster/errors"
@@ -63,8 +65,20 @@ type Method struct {
 	Response *Message
 }
 
-// Path returns HTTPRule.Path.
-func (m *Method) Path() string { return m.HTTPRule.Path }
+// Path return path with lowerCamelCased params.
+func (m *Method) Path() string {
+	splitPath := strings.Split(m.HTTPRule.Path[1:], "/")
+	var res strings.Builder
+	for _, p := range splitPath {
+		res.WriteRune('/')
+		if len(p) > 2 && p[0] == '{' && p[len(p)-1] == '}' {
+			res.WriteString(LowerCamelCase(p))
+		} else {
+			res.WriteString(p)
+		}
+	}
+	return res.String()
+}
 
 // Body returns HTTPRule.Body.
 func (m *Method) Body() string { return m.HTTPRule.Body }
