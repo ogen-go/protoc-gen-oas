@@ -22,31 +22,33 @@ func NewHTTPRules(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
 
 	var (
 		rules     []*HTTPRule
-		walkRules func(rule *annotations.HttpRule)
+		walkRules func(rule *annotations.HttpRule, additional bool)
 	)
-	walkRules = func(rule *annotations.HttpRule) {
+	walkRules = func(rule *annotations.HttpRule, additional bool) {
 		if rule == nil {
 			return
 		}
 		rules = append(rules, &HTTPRule{
-			Method: method(rule),
-			Path:   path(rule),
-			Body:   rule.Body,
+			Method:     method(rule),
+			Path:       path(rule),
+			Body:       rule.Body,
+			Additional: additional,
 		})
 		for _, binding := range rule.AdditionalBindings {
-			walkRules(binding)
+			walkRules(binding, true)
 		}
 	}
-	walkRules(httpRule)
+	walkRules(httpRule, false)
 
 	return rules, nil
 }
 
 // HTTPRule instance.
 type HTTPRule struct {
-	Method string
-	Path   string
-	Body   string
+	Method     string
+	Path       string
+	Body       string
+	Additional bool
 }
 
 func httpRule(opts protoreflect.ProtoMessage) (*annotations.HttpRule, error) {
