@@ -1,0 +1,47 @@
+proto_file: {
+  name: "service.proto"
+  package: "service.v1"
+  message_type: {
+    name: "FooRequest"
+    field: {
+      name: "foo_id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "fooId"
+    }
+    field: {
+      name: "bar_id"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "barId"
+    }
+    field: {
+      name: "baz_id"
+      number: 3
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "baZId"
+    }
+  }
+  message_type: {
+    name: "FooResponse"
+  }
+  service: {
+    name: "Service"
+    method: {
+      name: "FooMethod"
+      input_type: "FooRequest"
+      output_type: "FooResponse"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/{foo_id}/{bar_id}/{baz_id}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}

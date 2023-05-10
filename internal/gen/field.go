@@ -39,7 +39,7 @@ type Field struct {
 func (f *Field) AsParameter(in string) *ogen.Parameter {
 	return ogen.NewParameter().
 		SetIn(in).
-		SetName(f.Name.String()).
+		SetName(f.Name.LowerCamelCase()).
 		SetSchema(f.Type.Schema()).
 		SetRequired(f.Options.IsRequired || in == "path")
 }

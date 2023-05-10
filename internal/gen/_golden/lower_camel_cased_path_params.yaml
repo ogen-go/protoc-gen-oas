@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+    title: ""
+    version: ""
+paths:
+    /api/v1/{fooId}/{barId}/{bazId}:
+        get:
+            operationId: fooMethod
+            parameters:
+                -   name: fooId
+                    in: query
+                    schema:
+                        type: string
+                -   name: barId
+                    in: query
+                    schema:
+                        type: string
+                -   name: bazId
+                    in: query
+                    schema:
+                        type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/FooResponse'
+components:
+    responses:
+        FooResponse:
+            description: FooResponse
+            content:
+                application/json:
+                    schema:
+                        type: object
