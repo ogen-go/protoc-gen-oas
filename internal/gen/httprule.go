@@ -14,17 +14,32 @@ import (
 var ErrNotImplHTTPRule = errors.New("not implements *annotations.HttpRule or nil")
 
 // NewHTTPRule returns HTTPRule instance.
-func NewHTTPRule(opts protoreflect.ProtoMessage) (*HTTPRule, error) {
+func NewHTTPRule(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
 	httpRule, err := httpRule(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	return &HTTPRule{
-		Method: method(httpRule),
-		Path:   path(httpRule),
-		Body:   httpRule.Body,
-	}, nil
+	var (
+		rules     []*HTTPRule
+		walkRules func(rule *annotations.HttpRule)
+	)
+	walkRules = func(rule *annotations.HttpRule) {
+		if rule == nil {
+			return
+		}
+		rules = append(rules, &HTTPRule{
+			Method: method(rule),
+			Path:   path(rule),
+			Body:   rule.Body,
+		})
+		for _, binding := range rule.AdditionalBindings {
+			walkRules(binding)
+		}
+	}
+	walkRules(httpRule)
+
+	return rules, nil
 }
 
 // HTTPRule instance.
