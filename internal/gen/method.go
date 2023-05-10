@@ -159,8 +159,11 @@ func (m *Method) Op() *ogen.Operation {
 	respName := m.Response.Name.String()
 	ref := respRef(respName)
 
-	return ogen.NewOperation().
-		SetOperationID(m.Name.LowerCamelCase()).
+	op := ogen.NewOperation()
+	if !m.HTTPRule.Additional {
+		op.SetOperationID(m.Name.LowerCamelCase())
+	}
+	return op.
 		SetParameters(m.parameters()).
 		SetResponses(ogen.Responses{
 			"200": ogen.NewResponse().SetRef(ref),
