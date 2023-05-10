@@ -13,8 +13,8 @@ import (
 // ErrNotImplHTTPRule reports that options not implements *annotations.HttpRule or nil.
 var ErrNotImplHTTPRule = errors.New("not implements *annotations.HttpRule or nil")
 
-// NewHTTPRule returns HTTPRule instance.
-func NewHTTPRule(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
+// NewHTTPRules returns HTTPRule slice.
+func NewHTTPRules(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
 	httpRule, err := httpRule(opts)
 	if err != nil {
 		return nil, err

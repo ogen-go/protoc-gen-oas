@@ -31,17 +31,15 @@ func NewMethod(httpRule *HTTPRule, m *protogen.Method) (*Method, error) {
 
 // NewMethods returns Methods instance.
 func NewMethods(ms []*protogen.Method) (Methods, error) {
-	methods := make(Methods, 0, len(ms))
+	methods := make(Methods, 0)
 
 	for _, m := range ms {
-		httpRules, err := NewHTTPRule(m.Desc.Options())
-		if err != nil {
-			return nil, err
-		}
+		httpRules, err := NewHTTPRules(m.Desc.Options())
 		switch {
 		case errors.Is(err, ErrNotImplHTTPRule): // skip
 			continue
-		case err != nil: // if error
+
+		case err != nil:
 			return nil, err
 		}
 
