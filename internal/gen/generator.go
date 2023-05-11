@@ -92,6 +92,7 @@ func (g *Generator) init() {
 	g.requestBodies = make(map[string]struct{})
 	g.parameters = make(map[string]struct{})
 	g.spec = ogen.NewSpec()
+	g.spec.Init()
 }
 
 func (g *Generator) setPaths() {
