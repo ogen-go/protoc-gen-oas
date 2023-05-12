@@ -2,6 +2,7 @@ package gen
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -248,7 +249,9 @@ func (g *Generator) mkOutput(rule HTTPRule, m *protogen.Method, op *ogen.Operati
 	if s != nil {
 		op.SetResponses(
 			ogen.Responses{
-				"200": ogen.NewResponse().SetJSONContent(s),
+				"200": ogen.NewResponse().
+					SetDescription(fmt.Sprintf("%s response", m.Desc.FullName())).
+					SetJSONContent(s),
 			},
 		)
 	}
