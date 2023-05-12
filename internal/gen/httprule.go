@@ -6,29 +6,34 @@ import (
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
-
-	"github.com/go-faster/errors"
 )
 
-// ErrNotImplHTTPRule reports that options not implements *annotations.HttpRule or nil.
-var ErrNotImplHTTPRule = errors.New("not implements *annotations.HttpRule or nil")
+func httpRule(opts protoreflect.ProtoMessage) (r *annotations.HttpRule, ok bool) {
+	r, ok = proto.GetExtension(opts, annotations.E_Http).(*annotations.HttpRule)
+	ok = ok && r != nil
+	return r, ok
+}
 
-// NewHTTPRules returns HTTPRule slice.
-func NewHTTPRules(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
-	httpRule, err := httpRule(opts)
-	if err != nil {
-		return nil, err
+type HTTPRule struct {
+	Path         string
+	Method       string
+	Body         string
+	ResponseBody string
+	Additional   bool
+}
+
+func collectRules(opts protoreflect.ProtoMessage) (rules []HTTPRule) {
+	r, ok := httpRule(opts)
+	if !ok {
+		return nil
 	}
 
-	var (
-		rules     []*HTTPRule
-		walkRules func(rule *annotations.HttpRule, additional bool)
-	)
+	var walkRules func(rule *annotations.HttpRule, additional bool)
 	walkRules = func(rule *annotations.HttpRule, additional bool) {
 		if rule == nil {
 			return
 		}
-		rules = append(rules, &HTTPRule{
+		rules = append(rules, HTTPRule{
 			Method:     method(rule),
 			Path:       path(rule),
 			Body:       rule.Body,
@@ -38,27 +43,9 @@ func NewHTTPRules(opts protoreflect.ProtoMessage) ([]*HTTPRule, error) {
 			walkRules(binding, true)
 		}
 	}
-	walkRules(httpRule, false)
+	walkRules(r, false)
 
-	return rules, nil
-}
-
-// HTTPRule instance.
-type HTTPRule struct {
-	Method     string
-	Path       string
-	Body       string
-	Additional bool
-}
-
-func httpRule(opts protoreflect.ProtoMessage) (*annotations.HttpRule, error) {
-	ext := proto.GetExtension(opts, annotations.E_Http)
-	httpRule, ok := ext.(*annotations.HttpRule)
-	if !ok || httpRule == nil {
-		return nil, ErrNotImplHTTPRule
-	}
-
-	return httpRule, nil
+	return rules
 }
 
 func method(httpRule *annotations.HttpRule) string {

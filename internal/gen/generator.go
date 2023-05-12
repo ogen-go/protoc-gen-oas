@@ -2,14 +2,16 @@ package gen
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
+	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/yaml"
+
 	"github.com/ogen-go/ogen"
 )
 
@@ -17,63 +19,79 @@ import (
 var ErrNoMethods = errors.New("protoc-gen-oas: service has no methods")
 
 // NewGenerator returns new Generator instance.
-func NewGenerator(protoFiles []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
+func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
-
-	fs, err := NewFiles(protoFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	messages := make(map[string]struct{})
-
-	for _, f := range fs {
-		if isSkip := !f.Generate; isSkip {
-			continue
-		}
-
-		for _, service := range f.Services {
-			for _, method := range service.Methods {
-				g.methods = append(g.methods, method)
-				messages[method.Response.Name.String()] = struct{}{}
-				messages[method.Request().Name.String()] = struct{}{}
-			}
-		}
-	}
-
-	for _, f := range fs {
-		for _, message := range f.Messages {
-			if _, ok := messages[message.Name.String()]; ok {
-				g.messages = append(g.messages, message)
-			}
-		}
-	}
-
-	if len(g.methods) == 0 {
-		return nil, ErrNoMethods
-	}
-
 	g.init()
-
 	for _, opt := range opts {
 		opt(g)
 	}
 
-	g.setPaths()
-	g.mkComponents()
+	type endpoint struct {
+		Rule   HTTPRule
+		Method *protogen.Method
+	}
+
+	for _, f := range files {
+		if !f.Generate {
+			continue
+		}
+
+		for _, m := range f.Messages {
+			if err := g.mkSchema(m); err != nil {
+				return nil, err
+			}
+		}
+
+		for _, e := range f.Enums {
+			if err := g.mkEnum(e); err != nil {
+				return nil, err
+			}
+		}
+
+		for _, s := range f.Services {
+			for _, m := range s.Methods {
+				for _, rule := range collectRules(m.Desc.Options()) {
+					pi := g.spec.Paths[rule.Path]
+					if pi == nil {
+						pi = ogen.NewPathItem()
+						g.spec.AddPathItem(rule.Path, pi)
+					}
+
+					var to **ogen.Operation
+					switch rule.Method {
+					case http.MethodGet:
+						to = &pi.Get
+					case http.MethodPut:
+						to = &pi.Put
+					case http.MethodPost:
+						to = &pi.Post
+					case http.MethodDelete:
+						to = &pi.Delete
+					case http.MethodPatch:
+						to = &pi.Patch
+					}
+
+					if *to != nil {
+						return nil, errors.Errorf("conflict on endpoint %s %s", rule.Method, rule.Path)
+					}
+
+					op, err := g.mkMethod(rule, m)
+					if err != nil {
+						return nil, errors.Wrapf(err, "make method %s => %s %s mapping", m.Desc.FullName(), rule.Method, rule.Path)
+					}
+
+					*to = op
+				}
+			}
+		}
+	}
 
 	return g, nil
 }
 
 // Generator instance.
 type Generator struct {
-	methods       Methods
-	messages      Messages
-	schemas       map[string]struct{}
-	responses     map[string]struct{}
-	requestBodies map[string]struct{}
-	parameters    map[string]struct{}
-	spec          *ogen.Spec
+	spec *ogen.Spec
 }
 
 // YAML returns OpenAPI specification bytes.
@@ -87,202 +105,8 @@ func (g *Generator) JSON() ([]byte, error) {
 }
 
 func (g *Generator) init() {
-	g.schemas = make(map[string]struct{})
-	g.responses = make(map[string]struct{})
-	g.requestBodies = make(map[string]struct{})
-	g.parameters = make(map[string]struct{})
 	g.spec = ogen.NewSpec()
 	g.spec.Init()
-}
-
-func (g *Generator) setPaths() {
-	for _, method := range g.methods {
-		g.addPath(method)
-	}
-}
-
-func (g *Generator) addPath(m *Method) {
-	g.responses[m.Response.Name.String()] = struct{}{}
-
-	switch m.HTTPRule.Method {
-	case http.MethodGet:
-		g.setGetOp(m)
-
-	case http.MethodPut:
-		g.setPutOp(m)
-
-	case http.MethodPost:
-		g.setPostOp(m)
-
-	case http.MethodDelete:
-		g.setDeleteOp(m)
-
-	case http.MethodPatch:
-		g.setPatchOp(m)
-	}
-}
-
-func (g *Generator) setGetOp(m *Method) {
-	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetGet(m.Op()))
-	} else {
-		g.spec.Paths[m.Path()].SetGet(m.Op())
-	}
-}
-
-func (g *Generator) setPutOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request())
-
-	op := m.Op().SetRequestBody(reqBody)
-
-	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetPut(op))
-	} else {
-		g.spec.Paths[m.Path()].SetPut(op)
-	}
-}
-
-func (g *Generator) setPostOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request())
-
-	op := m.Op().SetRequestBody(reqBody)
-
-	if g.spec.Paths[m.HTTPRule.Path] == nil {
-		g.spec.AddPathItem(m.HTTPRule.Path, ogen.NewPathItem().SetPost(op))
-	} else {
-		g.spec.Paths[m.HTTPRule.Path].SetPost(op)
-	}
-}
-
-func (g *Generator) setDeleteOp(m *Method) {
-	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetDelete(m.Op()))
-	} else {
-		g.spec.Paths[m.Path()].SetDelete(m.Op())
-	}
-}
-
-func (g *Generator) setPatchOp(m *Method) {
-	reqBody := g.mkReqBody(m.Path(), m.Request())
-
-	op := m.Op().SetRequestBody(reqBody)
-
-	if g.spec.Paths[m.Path()] == nil {
-		g.spec.AddPathItem(m.Path(), ogen.NewPathItem().SetPatch(op))
-	} else {
-		g.spec.Paths[m.Path()].SetPatch(op)
-	}
-}
-
-func (g *Generator) mkReqBody(path string, m *Message) *ogen.RequestBody {
-	ref := reqBodyRef(m.Name.CamelCase())
-	g.spec.AddRequestBody(m.Name.CamelCase(), ogen.NewRequestBody().SetContent(g.mkReqBodyContent(path, m)))
-	return ogen.NewRequestBody().SetRef(ref)
-}
-
-func (g *Generator) mkReqBodyContent(path string, m *Message) map[string]ogen.Media {
-	if len(m.Fields) == 0 {
-		return map[string]ogen.Media{
-			"application/json": {},
-		}
-	}
-
-	curlyBracketsWords := curlyBracketsWords(path)
-	isPathParam := func(pathName string) bool {
-		_, isPathParam := curlyBracketsWords[pathName]
-		return isPathParam
-	}
-
-	properties := make(ogen.Properties, 0, len(m.Fields))
-	r := make([]string, 0)
-
-	for _, f := range m.Fields {
-		if isPathParam(f.Name.String()) {
-			continue
-		}
-		property := g.property(f)
-		properties = append(properties, property)
-		if f.Options.IsRequired {
-			r = append(r, f.Name.LowerCamelCase())
-		}
-	}
-
-	return map[string]ogen.Media{
-		"application/json": {
-			Schema: ogen.NewSchema().SetProperties(&properties).SetRequired(r),
-		},
-	}
-}
-
-func (g *Generator) mkComponents() {
-	g.mkResponses()
-}
-
-func (g *Generator) mkResponses() {
-	for _, message := range g.messages {
-		g.mkResponse(message)
-	}
-}
-
-func (g *Generator) mkResponse(m *Message) {
-	if _, ok := g.responses[m.Name.String()]; !ok {
-		return
-	}
-
-	schema := ogen.NewSchema()
-	properties := make(ogen.Properties, 0, len(m.Fields))
-	r := make([]string, 0)
-
-	for _, f := range m.Fields {
-		property := g.property(f)
-		properties = append(properties, property)
-		if f.Options.IsRequired {
-			r = append(r, f.Name.LowerCamelCase())
-		}
-	}
-	schema.SetProperties(&properties).SetRequired(r)
-	g.spec.AddResponse(m.Name.String(), ogen.NewResponse().
-		SetDescription(m.Name.String()).
-		SetContent(map[string]ogen.Media{
-			"application/json": {
-				Schema: schema,
-			},
-		}),
-	)
-}
-
-func (g *Generator) property(f *Field) ogen.Property {
-	schema := g.propertySchema(f)
-
-	return ogen.Property{
-		Name:   f.Name.LowerCamelCase(),
-		Schema: schema,
-	}
-}
-
-func (g *Generator) propertySchema(f *Field) *ogen.Schema {
-	s := ogen.NewSchema()
-
-	switch f.Cardinality {
-	case CardinalityOptional:
-		if f.Type.HasEnum() {
-			g.spec.AddSchema(f.Name.CamelCase(), f.Type.Schema())
-			s.SetRef(schemaRef(f.Name.CamelCase()))
-		} else {
-			s = f.Type.Schema()
-		}
-
-	case CardinalityRepeated:
-		n := LastAfterDots(f.Type.Type)
-		if resp, ok := g.spec.Components.Responses[n]; ok {
-			if c, ok := resp.Content["application/json"]; ok {
-				g.spec.AddSchema(n, c.Schema)
-				s.SetType("array").SetItems(ogen.NewSchema().SetRef(schemaRef(n)))
-			}
-		}
-	}
-
-	return s
 }
 
 func curlyBracketsWords(path string) map[string]struct{} {
@@ -301,15 +125,198 @@ func curlyBracketsWords(path string) map[string]struct{} {
 	return curlyBracketsWords
 }
 
-func schemaRef(s string) string {
-	return fmt.Sprintf("#/components/schemas/%s", s)
+func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (*ogen.Operation, error) {
+	op := ogen.NewOperation()
+	if !rule.Additional {
+		op.SetOperationID(string(m.Desc.Name()))
+	}
+
+	if err := g.mkInput(rule, m, op); err != nil {
+		return nil, errors.Wrap(err, "make input")
+	}
+
+	if err := g.mkOutput(rule, m, op); err != nil {
+		return nil, errors.Wrap(err, "make output")
+	}
+
+	return op, nil
 }
 
-func respRef(s string) string {
-	resp := LastAfterDots(s)
-	return fmt.Sprintf("#/components/responses/%s", resp)
+func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) error {
+	var (
+		fields        = collectFields(m.Input)
+		hasPathParams bool
+	)
+	for name := range curlyBracketsWords(rule.Path) {
+		hasPathParams = true
+
+		f, ok := fields[name]
+		if !ok {
+			return errors.Errorf("unknown field %q", name)
+		}
+
+		p, err := g.mkParameter("path", f.Desc.TextName(), f)
+		if err != nil {
+			return err
+		}
+		op.AddParameters(p)
+
+		delete(fields, name)
+	}
+
+	var s *ogen.Schema
+	switch body := rule.Body; body {
+	case "*":
+		s = ogen.NewSchema()
+		// All remaining fields are inside request body.
+		if !hasPathParams {
+			// Special case: all message fields are inside body, generate a direct reference to schema.
+			s.SetRef(descriptorRef(m.Input.Desc))
+		} else {
+			// Map remaining fields.
+			if err := g.mkJSONFields(s, maps.Values(fields)); err != nil {
+				return errors.Wrap(err, "make requestBody schema")
+			}
+		}
+	default:
+		// TODO(tdakkota): generate a requestBody component.
+
+		// This field is body, remaining fields are query parameters.
+		f, ok := fields[body]
+		if !ok {
+			return errors.Errorf("unknown field %q", body)
+		}
+
+		fieldSch, err := g.mkFieldSchema(f.Desc)
+		if err != nil {
+			return errors.Wrapf(err, "make requestBody schema (field: %q)", body)
+		}
+		s = fieldSch
+
+		delete(fields, body)
+		fallthrough
+	case "":
+		// Remaining fields are query parameters.
+		if err := g.mkQueryParameters(op, fields); err != nil {
+			return err
+		}
+	}
+	if s != nil {
+		op.SetRequestBody(
+			ogen.NewRequestBody().SetJSONContent(s),
+		)
+	}
+	return nil
 }
 
-func reqBodyRef(s string) string {
-	return fmt.Sprintf("#/components/requestBodies/%s", s)
+func (g *Generator) mkOutput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) error {
+	fields := collectFields(m.Output)
+
+	s := ogen.NewSchema()
+	switch body := rule.ResponseBody; body {
+	case "", "*":
+		// Map all response fields.
+		s.SetRef(descriptorRef(m.Output.Desc))
+	default:
+		// TODO(tdakkota): generate a response component.
+
+		// This field is body, remaining fields are omitted.
+		f, ok := fields[body]
+		if !ok {
+			return errors.Errorf("unknown field %q", body)
+		}
+
+		fieldSch, err := g.mkFieldSchema(f.Desc)
+		if err != nil {
+			return errors.Wrapf(err, "make response schema (field: %q)", body)
+		}
+		s = fieldSch
+	}
+	if s != nil {
+		op.SetResponses(
+			ogen.Responses{
+				"200": ogen.NewResponse().SetJSONContent(s),
+			},
+		)
+	}
+	return nil
+}
+
+func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*protogen.Field) error {
+	flattenFields := make(map[string]*protogen.Field, len(fields))
+
+	// Recursively collect and flatten message type to primitive parameters.
+	//
+	// For example, if path template is "/v1/messages/{message_id}":
+	//
+	//	 message GetMessageRequest {
+	//	 	message SubMessage {
+	//	 	  string subfield = 1;
+	//	 	}
+	//	 	string message_id = 1; // Mapped to URL path.
+	//	 	int64 revision = 2;    // Mapped to URL query parameter `revision`.
+	//	 	SubMessage sub = 3;    // Mapped to URL query parameter `sub.subfield`.
+	//	 }
+	//
+	// See https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding.
+	var walkFields func(prefix string, fields []*protogen.Field) error
+	walkFields = func(prefix string, fields []*protogen.Field) error {
+		for _, f := range fields {
+			fd := f.Desc
+			name := prefix + fd.TextName()
+
+			switch kind := fd.Kind(); kind {
+			case protoreflect.MessageKind:
+				_, ok, err := g.mkWellKnownPrimitive(fd.Message())
+				if err != nil {
+					return err
+				}
+				if !ok {
+					if err := walkFields(name+".", f.Message.Fields); err != nil {
+						return err
+					}
+					continue
+				}
+			case protoreflect.GroupKind:
+				return errors.Errorf("unsupported kind: %s", kind)
+			}
+
+			flattenFields[name] = f
+		}
+		return nil
+	}
+	if err := walkFields("", maps.Values(fields)); err != nil {
+		return err
+	}
+
+	for name, f := range flattenFields {
+		p, err := g.mkParameter("query", name, f)
+		if err != nil {
+			return err
+		}
+		op.AddParameters(p)
+	}
+
+	return nil
+}
+
+func (g *Generator) mkParameter(in, name string, f *protogen.Field) (*ogen.Parameter, error) {
+	s, err := g.mkFieldSchema(f.Desc)
+	if err != nil {
+		return nil, errors.Wrapf(err, "generate %s parameter %q", in, f.Desc.Name())
+	}
+
+	return ogen.NewParameter().
+		SetIn(in).
+		SetName(name).
+		SetRequired(f.Desc.Cardinality() == protoreflect.Required || in == "path").
+		SetSchema(s), nil
+}
+
+func collectFields(message *protogen.Message) (fields map[string]*protogen.Field) {
+	fields = make(map[string]*protogen.Field, len(message.Fields))
+	for _, f := range message.Fields {
+		fields[string(f.Desc.Name())] = f
+	}
+	return fields
 }
