@@ -13,24 +13,29 @@ paths:
                     schema:
                         type: string
             requestBody:
-                $ref: '#/components/requestBodies/Request'
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                body:
+                                    type: string
+                required: true
             responses:
                 "200":
-                    $ref: '#/components/responses/Response'
+                    description: service.v1.Service.PutMethod response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Response'
 components:
-    responses:
-        Response:
-            description: Response
-            content:
-                application/json:
-                    schema:
-                        type: object
-    requestBodies:
+    schemas:
         Request:
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        properties:
-                            body:
-                                type: string
+            type: object
+            properties:
+                id:
+                    type: string
+                body:
+                    type: string
+        Response:
+            type: object

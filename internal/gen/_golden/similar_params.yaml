@@ -19,7 +19,11 @@ paths:
                         format: int64
             responses:
                 "200":
-                    $ref: '#/components/responses/Response'
+                    description: service.v1.Service.BarMethod response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Response'
     /api/v1/foo/{id}:
         get:
             operationId: fooMethod
@@ -35,12 +39,27 @@ paths:
                         type: string
             responses:
                 "200":
-                    $ref: '#/components/responses/Response'
+                    description: service.v1.Service.FooMethod response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Response'
 components:
-    responses:
+    schemas:
+        BarRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                query:
+                    type: string
+        FooRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                query:
+                    type: string
         Response:
-            description: Response
-            content:
-                application/json:
-                    schema:
-                        type: object
+            type: object
