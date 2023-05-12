@@ -44,7 +44,7 @@ proto_file: {
       number: 1
       label: LABEL_OPTIONAL
       type: TYPE_INT32
-      json_name: "name"
+      json_name: "limit"
       options:{
         [google.api.field_behavior]:REQUIRED
       }
@@ -54,7 +54,7 @@ proto_file: {
       number: 2
       label: LABEL_OPTIONAL
       type: TYPE_INT32
-      json_name: "name"
+      json_name: "offset"
       options:{
         [google.api.field_behavior]:REQUIRED
       }
