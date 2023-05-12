@@ -326,11 +326,23 @@ func (g *Generator) mkParameter(in, name string, f *protogen.Field) (*ogen.Param
 		return nil, errors.Wrapf(err, "generate %s parameter %q", in, f.Desc.Name())
 	}
 
-	return ogen.NewParameter().
+	p := ogen.NewParameter().
 		SetIn(in).
 		SetName(name).
-		SetRequired(f.Desc.Cardinality() == protoreflect.Required || in == "path").
-		SetSchema(s), nil
+		SetRequired(f.Desc.Cardinality() == protoreflect.Required).
+		SetSchema(s)
+
+	switch in {
+	case "path":
+		p.SetRequired(true)
+	case "query":
+		if s.Type == "array" {
+			// Explicitly set parameter style to match transcoding spec.
+			p.SetStyle("form").
+				SetExplode(true)
+		}
+	}
+	return p, nil
 }
 
 func collectFields(message *protogen.Message) (fields map[string]*protogen.Field) {
