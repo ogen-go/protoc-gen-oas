@@ -280,6 +280,10 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 
 			switch kind := fd.Kind(); kind {
 			case protoreflect.MessageKind:
+				if fd.IsMap() {
+					return errors.New("map parameters are not supported")
+				}
+
 				_, ok, err := g.mkWellKnownPrimitive(fd.Message())
 				if err != nil {
 					return err

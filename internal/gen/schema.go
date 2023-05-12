@@ -13,6 +13,17 @@ import (
 	"github.com/ogen-go/ogen"
 )
 
+func (g *Generator) mkEnum(e *protogen.Enum) error {
+	s := &ogen.Schema{
+		Type: "string",
+		Enum: enum(e.Desc),
+	}
+
+	name := descriptorName(e.Desc)
+	g.spec.AddSchema(name, s)
+	return nil
+}
+
 func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	if ed == nil {
 		return nil
@@ -27,17 +38,6 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	}
 
 	return enum
-}
-
-func (g *Generator) mkEnum(e *protogen.Enum) error {
-	s := &ogen.Schema{
-		Type: "string",
-		Enum: enum(e.Desc),
-	}
-
-	name := descriptorName(e.Desc)
-	g.spec.AddSchema(name, s)
-	return nil
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
@@ -90,7 +90,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 			return
 		}
 
-		if fd.Cardinality() == protoreflect.Repeated {
+		if fd.IsList() {
 			s = ogen.NewSchema().
 				SetType("array").
 				SetItems(s)
@@ -149,6 +149,23 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 			// Well-known type.
 			return wkt, nil
 		default:
+			if fd.IsMap() {
+				if keyKind := fd.MapKey().Kind(); keyKind != protoreflect.StringKind {
+					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
+				}
+
+				elem, err := g.mkFieldSchema(fd.MapValue())
+				if err != nil {
+					return nil, errors.Wrap(err, "make map key")
+				}
+				s = ogen.NewSchema().
+					SetType("object")
+				s.AdditionalProperties = &ogen.AdditionalProperties{
+					Schema: *elem,
+				}
+				return s, nil
+			}
+
 			// User-defined type.
 			return &ogen.Schema{Ref: descriptorRef(msg)}, nil
 		}
