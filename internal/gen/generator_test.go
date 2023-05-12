@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 
 	"github.com/go-faster/sdk/gold"
+	"github.com/ogen-go/ogen/openapi/parser"
 )
 
 func TestMain(m *testing.M) {
@@ -62,6 +63,10 @@ func TestNewGenerator(t *testing.T) {
 			require.NoError(t, err)
 
 			json, err := g.JSON()
+			require.NoError(t, err)
+
+			// Ensure spec is valid.
+			_, err = parser.Parse(g.spec, parser.Settings{})
 			require.NoError(t, err)
 
 			// Run go test with -update flag to update golden files.
