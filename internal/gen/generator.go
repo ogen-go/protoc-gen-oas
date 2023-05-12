@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -174,7 +175,12 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			s.SetRef(descriptorRef(m.Input.Desc))
 		} else {
 			// Map remaining fields.
-			if err := g.mkJSONFields(s, maps.Values(fields)); err != nil {
+			values := maps.Values(fields)
+			// Sort to make output stable.
+			slices.SortStableFunc(values, func(a, b *protogen.Field) bool {
+				return a.Desc.FullName() < b.Desc.FullName()
+			})
+			if err := g.mkJSONFields(s, values); err != nil {
 				return errors.Wrap(err, "make requestBody schema")
 			}
 		}
@@ -206,6 +212,13 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			ogen.NewRequestBody().SetJSONContent(s),
 		)
 	}
+	// Sort to make output stable.
+	slices.SortStableFunc(op.Parameters, func(a, b *ogen.Parameter) bool {
+		if a.In != b.In {
+			return a.In < b.In
+		}
+		return a.Name < b.Name
+	})
 	return nil
 }
 
