@@ -275,7 +275,10 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 	//	 }
 	//
 	// See https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding.
-	var walkFields func(prefix string, fields []*protogen.Field) error
+	var (
+		walkFields func(prefix string, fields []*protogen.Field) error
+		seen       = map[*protogen.Message]struct{}{}
+	)
 	walkFields = func(prefix string, fields []*protogen.Field) error {
 		for _, f := range fields {
 			fd := f.Desc
@@ -292,9 +295,16 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 					return err
 				}
 				if !ok {
-					if err := walkFields(name+".", f.Message.Fields); err != nil {
+					msg := f.Message
+					if _, ok := seen[msg]; ok {
+						return errors.Errorf("query parameter cannot be recursive: field %s", name)
+					}
+					seen[msg] = struct{}{}
+
+					if err := walkFields(name+".", msg.Fields); err != nil {
 						return err
 					}
+					delete(seen, msg)
 					continue
 				}
 			case protoreflect.GroupKind:
