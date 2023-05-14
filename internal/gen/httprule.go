@@ -14,6 +14,7 @@ func httpRule(opts protoreflect.ProtoMessage) (r *annotations.HttpRule, ok bool)
 	return r, ok
 }
 
+// HTTPRule is a parsed HTTP rule annotation.
 type HTTPRule struct {
 	Path         string
 	Method       string

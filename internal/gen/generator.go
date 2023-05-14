@@ -169,8 +169,8 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	}
 
 	var s *ogen.Schema
-	switch body := rule.Body; body {
-	case "*":
+	switch body := rule.Body; {
+	case body == "*":
 		s = ogen.NewSchema()
 		// All remaining fields are inside request body.
 		if !hasPathParams {
@@ -187,7 +187,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 				return "", errors.Wrap(err, "make requestBody schema")
 			}
 		}
-	default:
+	case body != "":
 		// TODO(tdakkota): generate a requestBody component.
 
 		// This field is body, remaining fields are query parameters.
@@ -204,7 +204,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 
 		delete(fields, body)
 		fallthrough
-	case "":
+	default:
 		// Remaining fields are query parameters.
 		if err := g.mkQueryParameters(op, fields); err != nil {
 			return "", err
