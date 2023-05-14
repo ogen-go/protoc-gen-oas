@@ -157,7 +157,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			return errors.Errorf("unknown field %q", name)
 		}
 
-		p, err := g.mkParameter("path", f.Desc.TextName(), f)
+		p, err := g.mkParameter("path", f.Desc.JSONName(), f)
 		if err != nil {
 			return err
 		}
