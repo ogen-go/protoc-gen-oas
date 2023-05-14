@@ -53,10 +53,15 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
 				for _, rule := range collectRules(m.Desc.Options()) {
-					pi := g.spec.Paths[rule.Path]
+					tmpl, op, err := g.mkMethod(rule, m)
+					if err != nil {
+						return nil, errors.Wrapf(err, "make method %s => %s %s mapping", m.Desc.FullName(), rule.Method, rule.Path)
+					}
+
+					pi := g.spec.Paths[tmpl]
 					if pi == nil {
 						pi = ogen.NewPathItem()
-						g.spec.AddPathItem(rule.Path, pi)
+						g.spec.AddPathItem(tmpl, pi)
 					}
 
 					var to **ogen.Operation
@@ -74,14 +79,8 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 					}
 
 					if *to != nil {
-						return nil, errors.Errorf("conflict on endpoint %s %s", rule.Method, rule.Path)
+						return nil, errors.Errorf("conflict on endpoint %s %s", rule.Method, tmpl)
 					}
-
-					op, err := g.mkMethod(rule, m)
-					if err != nil {
-						return nil, errors.Wrapf(err, "make method %s => %s %s mapping", m.Desc.FullName(), rule.Method, rule.Path)
-					}
-
 					*to = op
 				}
 			}
@@ -111,55 +110,58 @@ func (g *Generator) init() {
 	g.spec.Init()
 }
 
-func curlyBracketsWords(path string) map[string]struct{} {
-	words := strings.Split(path, "/")
-	curlyBracketsWords := make(map[string]struct{})
-	for _, word := range words {
-		if len(word) < 2 {
-			continue
-		}
-
-		if word[0] == '{' && word[len(word)-1] == '}' {
-			curlyBracketsWord := word[1 : len(word)-1]
-			curlyBracketsWords[curlyBracketsWord] = struct{}{}
-		}
-	}
-	return curlyBracketsWords
-}
-
-func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (*ogen.Operation, error) {
+func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (string, *ogen.Operation, error) {
 	op := ogen.NewOperation()
 	if !rule.Additional {
 		op.SetOperationID(LowerCamelCase(m.Desc.Name()))
 	}
 
-	if err := g.mkInput(rule, m, op); err != nil {
-		return nil, errors.Wrap(err, "make input")
+	tmpl, err := g.mkInput(rule, m, op)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "make input")
 	}
 
 	if err := g.mkOutput(rule, m, op); err != nil {
-		return nil, errors.Wrap(err, "make output")
+		return "", nil, errors.Wrap(err, "make output")
 	}
 
-	return op, nil
+	return tmpl, op, nil
 }
 
-func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) error {
+func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) (string, error) {
 	var (
 		fields        = collectFields(m.Input)
 		hasPathParams bool
 	)
-	for name := range curlyBracketsWords(rule.Path) {
+
+	pathTmpl, err := parsePathTemplate(rule.Path)
+	if err != nil {
+		return "", errors.Wrap(err, "parse path template")
+	}
+
+	var tmpl strings.Builder
+	tmpl.WriteByte('/')
+	for _, part := range pathTmpl.Path {
+		if !part.IsParam() {
+			tmpl.WriteString(part.Raw)
+			continue
+		}
 		hasPathParams = true
 
+		name := part.Param
 		f, ok := fields[name]
 		if !ok {
-			return errors.Errorf("unknown field %q", name)
+			return "", errors.Errorf("unknown field %q", name)
 		}
 
-		p, err := g.mkParameter("path", f.Desc.JSONName(), f)
+		specName := f.Desc.JSONName()
+		tmpl.WriteByte('{')
+		tmpl.WriteString(specName)
+		tmpl.WriteByte('}')
+
+		p, err := g.mkParameter("path", specName, f)
 		if err != nil {
-			return err
+			return "", err
 		}
 		op.AddParameters(p)
 
@@ -182,7 +184,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 				return a.Desc.FullName() < b.Desc.FullName()
 			})
 			if err := g.mkJSONFields(s, values); err != nil {
-				return errors.Wrap(err, "make requestBody schema")
+				return "", errors.Wrap(err, "make requestBody schema")
 			}
 		}
 	default:
@@ -191,12 +193,12 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		// This field is body, remaining fields are query parameters.
 		f, ok := fields[body]
 		if !ok {
-			return errors.Errorf("unknown field %q", body)
+			return "", errors.Errorf("unknown field %q", body)
 		}
 
 		fieldSch, err := g.mkFieldSchema(f.Desc)
 		if err != nil {
-			return errors.Wrapf(err, "make requestBody schema (field: %q)", body)
+			return "", errors.Wrapf(err, "make requestBody schema (field: %q)", body)
 		}
 		s = fieldSch
 
@@ -205,7 +207,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	case "":
 		// Remaining fields are query parameters.
 		if err := g.mkQueryParameters(op, fields); err != nil {
-			return err
+			return "", err
 		}
 	}
 	if s != nil {
@@ -220,7 +222,8 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		}
 		return a.Name < b.Name
 	})
-	return nil
+
+	return tmpl.String(), nil
 }
 
 func (g *Generator) mkOutput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) error {
