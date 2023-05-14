@@ -130,7 +130,7 @@ func curlyBracketsWords(path string) map[string]struct{} {
 func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (*ogen.Operation, error) {
 	op := ogen.NewOperation()
 	if !rule.Additional {
-		op.SetOperationID(string(m.Desc.Name()))
+		op.SetOperationID(LowerCamelCase(m.Desc.Name()))
 	}
 
 	if err := g.mkInput(rule, m, op); err != nil {

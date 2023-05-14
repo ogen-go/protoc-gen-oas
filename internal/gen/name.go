@@ -40,7 +40,7 @@ func isASCIIDigit(c byte) bool {
 // C++ generator lowercases names, it's extremely unlikely to have two fields
 // with different capitalizations.
 // In short, _my_field_name_2 becomes XMyFieldName_2.
-func CamelCase(s string) string {
+func CamelCase[S ~string](s S) string {
 	if s == "" {
 		return ""
 	}
@@ -80,7 +80,7 @@ func CamelCase(s string) string {
 }
 
 // LowerCamelCase returns the lowerCamelCased name.
-func LowerCamelCase(s string) string {
+func LowerCamelCase[S ~string](s S) string {
 	return Decapitalize(CamelCase(s))
 }
 
