@@ -168,9 +168,14 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		delete(fields, name)
 	}
 
-	var s *ogen.Schema
+	var (
+		s        *ogen.Schema
+		required bool
+	)
 	switch body := rule.Body; {
 	case body == "*":
+		required = true
+
 		s = ogen.NewSchema()
 		// All remaining fields are inside request body.
 		if !hasPathParams {
@@ -195,6 +200,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		if !ok {
 			return "", errors.Errorf("unknown field %q", body)
 		}
+		required = isFieldRequired(f)
 
 		fieldSch, err := g.mkFieldSchema(f.Desc)
 		if err != nil {
@@ -212,7 +218,9 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	}
 	if s != nil {
 		op.SetRequestBody(
-			ogen.NewRequestBody().SetJSONContent(s),
+			ogen.NewRequestBody().
+				SetRequired(required).
+				SetJSONContent(s),
 		)
 	}
 	// Sort to make output stable.

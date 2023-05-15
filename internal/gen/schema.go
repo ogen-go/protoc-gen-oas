@@ -75,7 +75,7 @@ func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error
 			Name:   f.Desc.JSONName(),
 			Schema: propSchema,
 		}
-		if f.Desc.Cardinality() == protoreflect.Required {
+		if isFieldRequired(f) {
 			s.AddRequiredProperties(&prop)
 		} else {
 			s.AddOptionalProperties(&prop)
@@ -226,6 +226,10 @@ func (g *Generator) mkWellKnownPrimitive(msg protoreflect.MessageDescriptor) (s 
 		}
 	}
 	return nil, false, nil
+}
+
+func isFieldRequired(f *protogen.Field) bool {
+	return f.Desc.Cardinality() == protoreflect.Required
 }
 
 type descriptor interface {
