@@ -1,0 +1,151 @@
+{{ define "messages" }}
+{{- template "header" $ }}
+
+func indirectOf[P ~*T, T any](p P) (zero T) {
+    return zero
+}
+
+func elemOf[S ~[]T, T any](s S) (zero T) {
+    return zero
+}
+
+func valueOf[M ~map[K]V, K comparable, V any](m M) (zero V) {
+    return zero
+}
+
+func initPtr[P ~*T, T any](p *P) {
+    var zero T
+    *p = &zero
+}
+
+func insertMap[M ~map[K]V, K comparable, V any](m *M, k K, v V) {
+    if *m == nil {
+        *m = make(M)
+    }
+    (*m)[k] = v
+}
+
+{{ range $m := $.Messages }}
+func (pm *{{ $m.ProtoType }}) FromOpenAPI(om {{ $m.OgenType }}) {
+    {{- range $f := $m.Fields -}}
+        {{ template "map_value_from" $f.Elem }}
+    {{ end -}}
+}
+
+func (pm *{{ $m.ProtoType }}) ToOpenAPI() (om {{ $m.OgenType }}) {
+    {{- range $f := $m.Fields -}}
+        {{ template "map_value_to" $f.Elem }}
+    {{ end -}}
+    return om
+}
+{{ end }}
+
+{{ range $e := $.Enums }}
+func (pm *{{ $e.ProtoType }}) FromOpenAPI(om {{ $e.OgenType }}) {
+    idx := {{ $e.EnumValueMap }}[string(om)]
+    *pm = {{ $e.ProtoType }}(idx)
+}
+
+func (pm {{ $e.ProtoType }}) ToOpenAPI() {{ $e.OgenType }} {
+    name := {{ $e.EnumNameMap }}[int32(pm)]
+    return {{ $e.OgenType }}(name)
+}
+{{ end }}
+
+{{- end }}
+
+
+{{ define "map_value_to" }}
+{{ $t := $.Ogen }}
+{{- if $.CheckProtoForNil -}} if {{ $.ProtoSel }} != nil {{- end }} {
+    {{- if $t.IsPointer }}
+        ogenVal := indirectOf({{ $.OgenSel }})
+        {{- $elem := field_elem $t.PointerTo $.Proto "ogenVal" $.ProtoSel -}}
+        {{ template "map_value_to" $elem }}
+        {{ $.OgenSel }} = &ogenVal
+    {{- else if $t.IsGeneric }}
+        ogenVal := {{ $.OgenSel }}.Value
+        {{- $elem := field_elem $t.GenericOf $.Proto "ogenVal" $.ProtoSel -}}
+        {{ template "map_value_to" $elem }}
+        {{ $.OgenSel }}.SetTo(ogenVal)
+	{{- else if $t.IsArray }}
+        for _, protoVal := range {{ $.ProtoSel }} {
+            ogenElem := elemOf({{ $.OgenSel }})
+
+            {{- $elem := field_elem $t.Item $.Proto "ogenElem" "protoVal" -}}
+            {{ template "map_value_to" $elem }}
+
+            {{ $.OgenSel }} = append({{ $.OgenSel }}, ogenElem)
+        }
+	{{- else if $t.IsMap }}
+        for key, protoVal := range {{ $.ProtoSel }} {
+            ogenElem := valueOf({{ $.OgenSel }})
+
+            {{- $elem := field_elem $t.Item $.Proto "ogenElem" "protoVal" -}}
+            {{ template "map_value_to" $elem }}
+
+            insertMap(&{{ $.OgenSel }}, key, ogenElem)
+        }
+	{{- else if or ($t.IsStruct) ($t.IsAlias) }}
+        {{ $.OgenSel }} = {{ $.ProtoSel }}.ToOpenAPI()
+    {{- else if $t.IsEnum }}
+        {{ $.OgenSel }} = {{ $.ProtoSel }}.ToOpenAPI()
+    {{- else if $t.IsPrimitive }}
+        {{- if $.Ptr }}
+            {{ $.OgenSel }} = *{{ $.ProtoSel }}
+        {{- else }}
+            {{ $.OgenSel }} = {{ $.ProtoSel }}
+        {{- end }}
+    {{- else }}
+        {{ errorf "unsupported kind: %s" $t.Kind }}
+	{{- end }}
+}
+{{- end }}
+
+{{ define "map_value_from" }}
+    {{- $t := $.Ogen }}
+    {{- if $t.IsPointer }}
+        if {{ $.OgenSel }} != nil {
+            ogenVal := *{{ $.OgenSel }}
+            {{- $elem := field_elem $t.PointerTo $.Proto "ogenVal" $.ProtoSel -}}
+            {{ template "map_value_from" $elem }}
+        }
+    {{- else if $t.IsGeneric }}
+        if ogenVal, ok := {{ $.OgenSel }}.Get(); ok {
+            {{- $elem := field_elem $t.GenericOf $.Proto "ogenVal" $.ProtoSel -}}
+            {{ template "map_value_from" $elem }}
+        }
+	{{- else if $t.IsArray }}
+        for _, ogenVal := range {{ $.OgenSel }} {
+            protoVal := elemOf({{ $.ProtoSel }})
+
+            {{- $elem := field_elem $t.Item $.Proto "ogenVal" "protoVal" -}}
+            {{ template "map_value_from" $elem }}
+
+            {{ $.ProtoSel }} = append({{ $.ProtoSel }}, protoVal)
+        }
+	{{- else if $t.IsMap }}
+        for key, ogenVal := range {{ $.OgenSel }} {
+            protoVal := valueOf({{ $.ProtoSel }})
+
+            {{- $elem := field_elem $t.Item $.Proto "ogenVal" "protoVal" -}}
+            {{ template "map_value_from" $elem }}
+
+            insertMap(&{{ $.ProtoSel }}, key, protoVal)
+        }
+	{{- else if or ($t.IsStruct) ($t.IsAlias) }}
+        {{ $.ProtoSel }} = new({{ $.ProtoType }})
+        {{ $.ProtoSel }}.FromOpenAPI({{ $.OgenSel }})
+    {{- else if $t.IsEnum }}
+        {{ $.ProtoSel }} = new({{ $.ProtoType }})
+        {{ $.ProtoSel }}.FromOpenAPI({{ $.OgenSel }})
+    {{- else if $t.IsPrimitive }}
+        {{- if $.Ptr }}
+            {{ $.ProtoSel }} = &{{ $.OgenSel }}
+        {{- else }}
+            {{ $.ProtoSel }} = {{ $.OgenSel }}
+        {{- end }}
+    {{- else }}
+        {{ errorf "unsupported kind: %s" $t.Kind }}
+	{{- end }}
+{{- end }}

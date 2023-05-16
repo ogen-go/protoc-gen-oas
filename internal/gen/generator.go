@@ -50,6 +50,19 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 						g.spec.AddPathItem(tmpl, pi)
 					}
 
+					ms, ok := g.ops[tmpl]
+					if !ok {
+						ms = &methodSet{
+							Methods: map[string]methodRule{},
+						}
+						g.ops[tmpl] = ms
+					}
+					ms.Methods[rule.Method] = methodRule{
+						Rule:    rule,
+						Method:  m,
+						Service: s,
+					}
+
 					var to **ogen.Operation
 					switch rule.Method {
 					case http.MethodGet:
@@ -98,12 +111,28 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 	return g, nil
 }
 
+type methodSet struct {
+	Template pathTemplate
+	// HTTP Method -> RPC Method.
+	Methods map[string]methodRule
+}
+
+type methodRule struct {
+	Rule    HTTPRule
+	Method  *protogen.Method
+	Service *protogen.Service
+}
+
 // Generator instance.
 type Generator struct {
 	spec            *ogen.Spec
 	indent          int
 	requests        map[string]struct{}
 	descriptorNames map[string]struct{}
+
+	messages map[string]*protogen.Message
+	enums    map[string]*protogen.Enum
+	ops      map[string]*methodSet
 }
 
 // YAML returns OpenAPI specification bytes.
@@ -128,8 +157,13 @@ func (g *Generator) JSON() ([]byte, error) {
 func (g *Generator) init() {
 	g.spec = ogen.NewSpec()
 	g.spec.Init()
+
 	g.requests = make(map[string]struct{})
 	g.descriptorNames = make(map[string]struct{})
+
+	g.messages = map[string]*protogen.Message{}
+	g.enums = map[string]*protogen.Enum{}
+	g.ops = map[string]*methodSet{}
 }
 
 func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method, deprecated bool) (string, *ogen.Operation, error) {

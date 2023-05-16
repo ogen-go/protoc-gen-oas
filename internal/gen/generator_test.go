@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 
 	"github.com/go-faster/sdk/gold"
+
 	"github.com/ogen-go/ogen/openapi/parser"
 )
 
