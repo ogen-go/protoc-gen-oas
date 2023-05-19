@@ -23,10 +23,10 @@ func Test_parsePathTemplate(t *testing.T) {
 		{"/foo/**", pathTemplate{}, "at 5: wildcard patterns are unsupported"},
 		{"/api/v1/{repo}/*", pathTemplate{}, "at 15: wildcard patterns are unsupported"},
 
-		{"/api/v1/{repo=*}", pathTemplate{}, "at 13: subsegements are unsupported"},
-		{"/api/v1/{repo=**}", pathTemplate{}, "at 13: subsegements are unsupported"},
-		{"/api/v1/{repo=/**}", pathTemplate{}, "at 13: subsegements are unsupported"},
-		{"/api/v1/{repo=/issues}", pathTemplate{}, "at 13: subsegements are unsupported"},
+		{"/api/v1/{repo=*}", pathTemplate{}, "at 13: subsegments are unsupported"},
+		{"/api/v1/{repo=**}", pathTemplate{}, "at 13: subsegments are unsupported"},
+		{"/api/v1/{repo=/**}", pathTemplate{}, "at 13: subsegments are unsupported"},
+		{"/api/v1/{repo=/issues}", pathTemplate{}, "at 13: subsegments are unsupported"},
 
 		{"/api/v1/{repo", pathTemplate{}, "at 13: missing '}'"},
 

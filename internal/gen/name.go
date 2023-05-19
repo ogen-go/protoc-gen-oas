@@ -6,21 +6,6 @@ import (
 	"unicode/utf8"
 )
 
-// NewName returns Name instance.
-func NewName(s string) Name { return Name(s) }
-
-// Name instance.
-type Name string
-
-// String implements fmt.Stringer.
-func (n Name) String() string { return string(n) }
-
-// LowerCamelCase returns lowerCamelCased Name.
-func (n Name) LowerCamelCase() string { return LowerCamelCase(n.String()) }
-
-// CamelCase returns CamelCased Name.
-func (n Name) CamelCase() string { return CamelCase(n.String()) }
-
 // Is c an ASCII lower-case letter?
 func isASCIILower(c byte) bool {
 	return 'a' <= c && c <= 'z'

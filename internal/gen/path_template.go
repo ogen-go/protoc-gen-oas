@@ -16,7 +16,7 @@ type PathSegment struct {
 	Param string
 }
 
-// IsParam whether is segement defines a path parameter.
+// IsParam whether is segment defines a path parameter.
 func (p PathSegment) IsParam() bool {
 	return p.Param != ""
 }
@@ -69,7 +69,7 @@ func parsePathTemplate(tmpl string) (p pathTemplate, _ error) {
 
 			// TODO(tdakkota): probably, we can handle some, e.g. /api/v1/{id=users/*}
 			if tmpl[endIdx] == '=' {
-				return p, errAt(endIdx, "subsegements are unsupported")
+				return p, errAt(endIdx, "subsegments are unsupported")
 			}
 
 			name := tmpl[i:endIdx]
