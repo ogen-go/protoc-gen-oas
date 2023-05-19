@@ -17,20 +17,12 @@ import (
 	"github.com/ogen-go/ogen"
 )
 
-// ErrNoMethods reports that service have no methods.
-var ErrNoMethods = errors.New("protoc-gen-oas: service has no methods")
-
 // NewGenerator returns new Generator instance.
 func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, error) {
 	g := new(Generator)
 	g.init()
 	for _, opt := range opts {
 		opt(g)
-	}
-
-	type endpoint struct {
-		Rule   HTTPRule
-		Method *protogen.Method
 	}
 
 	for _, f := range files {
