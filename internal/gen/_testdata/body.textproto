@@ -26,6 +26,16 @@ proto_file: {
     }
   }
   message_type: {
+    name: "SingleFieldRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+    }
+  }
+  message_type: {
     name: "Response"
   }
   service: {
@@ -48,6 +58,17 @@ proto_file: {
       options: {
         [google.api.http]: {
           put: "/api/v1/{id}"
+          body: "*"
+        }
+      }
+    }
+    method: {
+      name: "SingleFieldInPath"
+      input_type: "SingleFieldRequest"
+      output_type: "Response"
+      options: {
+        [google.api.http]: {
+          post: "/api/v1/single_field/{id}"
           body: "*"
         }
       }

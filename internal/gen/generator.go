@@ -174,14 +174,18 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	)
 	switch body := rule.Body; {
 	case body == "*":
+		// All remaining fields are inside request body.
 		required = true
 
 		s = ogen.NewSchema()
-		// All remaining fields are inside request body.
-		if !hasPathParams {
+		switch {
+		case !hasPathParams:
 			// Special case: all message fields are inside body, generate a direct reference to schema.
 			s.SetRef(descriptorRef(m.Input.Desc))
-		} else {
+		case len(fields) < 1:
+			// Special case: no remaining fields.
+			s = nil
+		default:
 			// Map remaining fields.
 			values := maps.Values(fields)
 			// Sort to make output stable.
