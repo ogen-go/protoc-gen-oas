@@ -3,30 +3,42 @@ info:
     title: ""
     version: ""
 paths:
-    /api/v1/{fooId}/{barId}/{bazId}:
+    /api/v1/{fooId}/{barId}/{baZId}:
         get:
             operationId: fooMethod
             parameters:
-                -   name: fooId
-                    in: query
+                -   name: baZId
+                    in: path
+                    required: true
                     schema:
                         type: string
                 -   name: barId
-                    in: query
+                    in: path
+                    required: true
                     schema:
                         type: string
-                -   name: bazId
-                    in: query
+                -   name: fooId
+                    in: path
+                    required: true
                     schema:
                         type: string
             responses:
                 "200":
-                    $ref: '#/components/responses/FooResponse'
+                    description: service.v1.Service.FooMethod response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FooResponse'
 components:
-    responses:
+    schemas:
+        FooRequest:
+            type: object
+            properties:
+                fooId:
+                    type: string
+                barId:
+                    type: string
+                baZId:
+                    type: string
         FooResponse:
-            description: FooResponse
-            content:
-                application/json:
-                    schema:
-                        type: object
+            type: object
