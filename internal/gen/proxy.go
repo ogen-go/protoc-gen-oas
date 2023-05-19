@@ -2,6 +2,7 @@ package gen
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"os"
 	"path"
@@ -163,8 +164,8 @@ func (g *Generator) mapSpec(og *gen.Generator) (mapping Mapping, _ error) {
 	}
 
 	for s, m := range services {
-		slices.SortStableFunc(m, func(a, b MethodMapping) bool {
-			return a.ProtoName < b.ProtoName
+		slices.SortStableFunc(m, func(a, b MethodMapping) int {
+			return cmp.Compare(a.ProtoName, b.ProtoName)
 		})
 		mapping.Services = append(mapping.Services, ServiceMapping{
 			ProtoName:   s.GoName,
@@ -174,14 +175,14 @@ func (g *Generator) mapSpec(og *gen.Generator) (mapping Mapping, _ error) {
 	}
 
 	// Ensure output is stable.
-	slices.SortStableFunc(mapping.Messages, func(a, b MessageMapping) bool {
-		return a.ProtoType < b.ProtoType
+	slices.SortStableFunc(mapping.Messages, func(a, b MessageMapping) int {
+		return cmp.Compare(a.ProtoType, b.ProtoType)
 	})
-	slices.SortStableFunc(mapping.Enums, func(a, b EnumMapping) bool {
-		return a.ProtoType < b.ProtoType
+	slices.SortStableFunc(mapping.Enums, func(a, b EnumMapping) int {
+		return cmp.Compare(a.ProtoType, b.ProtoType)
 	})
-	slices.SortStableFunc(mapping.Services, func(a, b ServiceMapping) bool {
-		return a.ProtoName < b.ProtoName
+	slices.SortStableFunc(mapping.Services, func(a, b ServiceMapping) int {
+		return cmp.Compare(a.ProtoName, b.ProtoName)
 	})
 	return mapping, nil
 }
