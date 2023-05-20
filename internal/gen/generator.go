@@ -30,12 +30,6 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 			continue
 		}
 
-		for _, m := range f.Messages {
-			if err := g.mkSchema(m); err != nil {
-				return nil, err
-			}
-		}
-
 		for _, e := range f.Enums {
 			if err := g.mkEnum(e); err != nil {
 				return nil, err
@@ -44,6 +38,12 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
+				if err := g.mkSchema(m.Input); err != nil {
+					return nil, errors.Wrap(err, "make schema for input")
+				}
+				if err := g.mkSchema(m.Output); err != nil {
+					return nil, errors.Wrap(err, "make schema for output")
+				}
 				for _, rule := range collectRules(m.Desc.Options()) {
 					tmpl, op, err := g.mkMethod(rule, m)
 					if err != nil {

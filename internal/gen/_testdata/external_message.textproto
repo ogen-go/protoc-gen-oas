@@ -1,0 +1,170 @@
+proto_file: {
+  name:"google/protobuf/empty.proto"
+  package:"google.protobuf"
+  message_type: {
+    name:"Empty"
+  }
+  options: {
+    java_package:"com.google.protobuf"
+    java_outer_classname:"EmptyProto"
+    java_multiple_files:true
+    go_package:"google.golang.org/protobuf/types/known/emptypb"
+    cc_enable_arenas:true
+    objc_class_prefix:"GPB"
+    csharp_namespace:"Google.Protobuf.WellKnownTypes"
+  }
+  source_code_info: {
+    location: {
+      span:30
+      span:0
+      span:50
+      span:16
+    }
+    location: {
+      path:12
+      span:30
+      span:0
+      span:18
+      leading_detached_comments:" Protocol Buffers - Google\'s data interchange format\n Copyright 2008 Google Inc.  All rights reserved.\n https://developers.google.com/protocol-buffers/\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions are\n met:\n\n     * Redistributions of source code must retain the above copyright\n notice, this list of conditions and the following disclaimer.\n     * Redistributions in binary form must reproduce the above\n copyright notice, this list of conditions and the following disclaimer\n in the documentation and/or other materials provided with the\n distribution.\n     * Neither the name of Google Inc. nor the names of its\n contributors may be used to endorse or promote products derived from\n this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+    }
+    location: {
+      path:2
+      span:32
+      span:0
+      span:24
+    }
+    location: {
+      path:8
+      span:34
+      span:0
+      span:59
+    }
+    location: {
+      path:8
+      path:37
+      span:34
+      span:0
+      span:59
+    }
+    location: {
+      path:8
+      span:35
+      span:0
+      span:69
+    }
+    location: {
+      path:8
+      path:11
+      span:35
+      span:0
+      span:69
+    }
+    location: {
+      path:8
+      span:36
+      span:0
+      span:44
+    }
+    location: {
+      path:8
+      path:1
+      span:36
+      span:0
+      span:44
+    }
+    location: {
+      path:8
+      span:37
+      span:0
+      span:43
+    }
+    location: {
+      path:8
+      path:8
+      span:37
+      span:0
+      span:43
+    }
+    location: {
+      path:8
+      span:38
+      span:0
+      span:34
+    }
+    location: {
+      path:8
+      path:10
+      span:38
+      span:0
+      span:34
+    }
+    location: {
+      path:8
+      span:39
+      span:0
+      span:33
+    }
+    location: {
+      path:8
+      path:36
+      span:39
+      span:0
+      span:33
+    }
+    location: {
+      path:8
+      span:40
+      span:0
+      span:31
+    }
+    location: {
+      path:8
+      path:31
+      span:40
+      span:0
+      span:31
+    }
+    location: {
+      path:4
+      path:0
+      span:50
+      span:0
+      span:16
+      leading_comments: " A generic empty message that you can re-use to avoid defining duplicated\n empty messages in your APIs. A typical example is to use it as the request\n or the response type of an API method. For instance:\n\n     service Foo {\n       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n     }\n\n"
+    }
+    location: {
+      path:4
+      path:0
+      path:1
+      span:50
+      span:8
+      span:13
+    }
+  }
+  syntax:"proto3"
+}
+
+proto_file: {
+  name: "service.proto"
+  package: "service.v1"
+  dependency: "google/protobuf/empty.proto"
+  message_type: {
+    name: "Request"
+  }
+  service: {
+    name: "Service"
+    method: {
+      name: "GetMethod"
+      input_type: "Request"
+      output_type: ".google.protobuf.Empty"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}
