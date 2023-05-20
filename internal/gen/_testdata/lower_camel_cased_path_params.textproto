@@ -22,7 +22,7 @@ proto_file: {
       number: 3
       label: LABEL_OPTIONAL
       type: TYPE_STRING
-      json_name: "baZId"
+      json_name: "bazId"
     }
   }
   message_type: {

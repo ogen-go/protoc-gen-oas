@@ -3,16 +3,16 @@ info:
     title: ""
     version: ""
 paths:
-    /api/v1/{fooId}/{barId}/{baZId}:
+    /api/v1/{fooId}/{barId}/{bazId}:
         get:
             operationId: fooMethod
             parameters:
-                -   name: baZId
+                -   name: barId
                     in: path
                     required: true
                     schema:
                         type: string
-                -   name: barId
+                -   name: bazId
                     in: path
                     required: true
                     schema:
@@ -31,14 +31,5 @@ paths:
                                 $ref: '#/components/schemas/FooResponse'
 components:
     schemas:
-        FooRequest:
-            type: object
-            properties:
-                fooId:
-                    type: string
-                barId:
-                    type: string
-                baZId:
-                    type: string
         FooResponse:
             type: object

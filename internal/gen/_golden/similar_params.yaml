@@ -46,20 +46,5 @@ paths:
                                 $ref: '#/components/schemas/Response'
 components:
     schemas:
-        BarRequest:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    format: int64
-                query:
-                    type: string
-        FooRequest:
-            type: object
-            properties:
-                id:
-                    type: string
-                query:
-                    type: string
         Response:
             type: object

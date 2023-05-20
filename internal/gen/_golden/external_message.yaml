@@ -17,5 +17,3 @@ components:
     schemas:
         Empty:
             type: object
-        Request:
-            type: object

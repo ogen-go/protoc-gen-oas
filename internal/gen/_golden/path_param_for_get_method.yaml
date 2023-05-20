@@ -21,10 +21,5 @@ paths:
                                 $ref: '#/components/schemas/Response'
 components:
     schemas:
-        Request:
-            type: object
-            properties:
-                id:
-                    type: string
         Response:
             type: object

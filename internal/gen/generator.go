@@ -38,12 +38,6 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
-				if err := g.mkSchema(m.Input); err != nil {
-					return nil, errors.Wrap(err, "make schema for input")
-				}
-				if err := g.mkSchema(m.Output); err != nil {
-					return nil, errors.Wrap(err, "make schema for output")
-				}
 				for _, rule := range collectRules(m.Desc.Options()) {
 					tmpl, op, err := g.mkMethod(rule, m)
 					if err != nil {
@@ -173,6 +167,9 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		switch {
 		case !hasPathParams:
 			// Special case: all message fields are inside body, generate a direct reference to schema.
+			if err := g.mkSchema(m.Input); err != nil {
+				return "", errors.Wrap(err, "make schema for input")
+			}
 			s.SetRef(descriptorRef(m.Input.Desc))
 		case len(fields) < 1:
 			// Special case: no remaining fields.
@@ -237,6 +234,9 @@ func (g *Generator) mkOutput(rule HTTPRule, m *protogen.Method, op *ogen.Operati
 	switch body := rule.ResponseBody; body {
 	case "", "*":
 		// Map all response fields.
+		if err := g.mkSchema(m.Output); err != nil {
+			return errors.Wrap(err, "make schema for output")
+		}
 		s.SetRef(descriptorRef(m.Output.Desc))
 	default:
 		// TODO(tdakkota): generate a response component.
