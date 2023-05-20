@@ -47,6 +47,15 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 		return err
 	}
 
+	for _, field := range msg.Fields {
+		if field.Desc.HasPresence() || !field.Desc.HasPresence() && field.Message == nil {
+			continue
+		}
+		if err := g.mkSchema(field.Message); err != nil {
+			return err
+		}
+	}
+
 	for _, m := range msg.Messages {
 		if err := g.mkSchema(m); err != nil {
 			return err
