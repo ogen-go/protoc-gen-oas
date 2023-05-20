@@ -24,8 +24,16 @@ message GetItemsRequest {
 }
 
 message GetItemsResponse {
+  message NestedItem {
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+    ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
+    string name = 3 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED];
+  }
+
   repeated Item items = 1 [(google.api.field_behavior) = REQUIRED];
   int32 total_count = 2 [(google.api.field_behavior) = REQUIRED];
+  NestedItem nested_item = 3;
 }
 
 message GetItemRequest {

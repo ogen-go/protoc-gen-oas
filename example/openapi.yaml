@@ -141,6 +141,20 @@ components:
                 totalCount:
                     type: integer
                     format: int32
+                nestedItem:
+                    $ref: '#/components/schemas/GetItemsResponse.NestedItem'
+        GetItemsResponse.NestedItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                type:
+                    $ref: '#/components/schemas/ItemType'
+                name:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
         Item:
             type: object
             properties:
