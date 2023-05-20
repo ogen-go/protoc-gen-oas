@@ -71,6 +71,8 @@ paths:
                             properties:
                                 name:
                                     type: string
+                            required:
+                                - name
                 required: true
             responses:
                 "200":
@@ -125,6 +127,8 @@ components:
             properties:
                 name:
                     type: string
+            required:
+                - name
         Empty:
             type: object
         GetItemsResponse:
@@ -137,6 +141,9 @@ components:
                 totalCount:
                     type: integer
                     format: int32
+            required:
+                - items
+                - totalCount
         Item:
             type: object
             properties:
@@ -144,3 +151,6 @@ components:
                     type: string
                 name:
                     type: string
+            required:
+                - id
+                - name
