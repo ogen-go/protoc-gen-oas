@@ -15,7 +15,5 @@ paths:
                                 $ref: '#/components/schemas/Response'
 components:
     schemas:
-        Request:
-            type: object
         Response:
             type: object

@@ -125,27 +125,8 @@ components:
             properties:
                 name:
                     type: string
-        DeleteItemRequest:
-            type: object
-            properties:
-                id:
-                    type: string
         Empty:
             type: object
-        GetItemRequest:
-            type: object
-            properties:
-                id:
-                    type: string
-        GetItemsRequest:
-            type: object
-            properties:
-                limit:
-                    type: integer
-                    format: int32
-                offset:
-                    type: integer
-                    format: int32
         GetItemsResponse:
             type: object
             properties:
@@ -157,20 +138,6 @@ components:
                     type: integer
                     format: int32
         Item:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
-        PatchItemRequest:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
-        UpdateItemRequest:
             type: object
             properties:
                 id:
