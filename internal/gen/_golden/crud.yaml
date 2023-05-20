@@ -9,11 +9,13 @@ paths:
             parameters:
                 -   name: limit
                     in: query
+                    required: true
                     schema:
                         type: integer
                         format: int32
                 -   name: offset
                     in: query
+                    required: true
                     schema:
                         type: integer
                         format: int32

@@ -9,11 +9,13 @@ paths:
             parameters:
                 -   name: limit
                     in: query
+                    required: true
                     schema:
                         type: integer
                         format: int32
                 -   name: offset
                     in: query
+                    required: true
                     schema:
                         type: integer
                         format: int32
@@ -73,6 +75,9 @@ paths:
                                     type: string
                                 type:
                                     $ref: '#/components/schemas/ItemType'
+                            required:
+                                - name
+                                - type
                 required: true
             responses:
                 "200":
@@ -129,6 +134,8 @@ components:
             properties:
                 name:
                     type: string
+            required:
+                - name
         Empty:
             type: object
         GetItemsResponse:
@@ -143,6 +150,9 @@ components:
                     format: int32
                 nestedItem:
                     $ref: '#/components/schemas/GetItemsResponse.NestedItem'
+            required:
+                - items
+                - totalCount
         GetItemsResponse.NestedItem:
             type: object
             properties:
@@ -155,6 +165,11 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+            required:
+                - id
+                - type
+                - name
+                - createdAt
         Item:
             type: object
             properties:
@@ -167,6 +182,11 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+            required:
+                - id
+                - type
+                - name
+                - createdAt
         ItemType:
             type: string
             enum:

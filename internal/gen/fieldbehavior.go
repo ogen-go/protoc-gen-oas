@@ -7,10 +7,10 @@ import (
 )
 
 func isFieldRequired(opts protoreflect.ProtoMessage) bool {
-	return denotesField(opts, annotations.FieldBehavior_REQUIRED)
+	return isFieldBehaviorIndicator(opts, annotations.FieldBehavior_REQUIRED)
 }
 
-func denotesField(opts protoreflect.ProtoMessage, indicator annotations.FieldBehavior) bool {
+func isFieldBehaviorIndicator(opts protoreflect.ProtoMessage, indicator annotations.FieldBehavior) bool {
 	fieldBehaviors, ok := proto.GetExtension(opts, annotations.E_FieldBehavior).([]annotations.FieldBehavior)
 	if !ok {
 		return false

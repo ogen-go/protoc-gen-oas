@@ -346,7 +346,7 @@ func (g *Generator) mkParameter(in, name string, f *protogen.Field) (*ogen.Param
 	p := ogen.NewParameter().
 		SetIn(in).
 		SetName(name).
-		SetRequired(f.Desc.Cardinality() == protoreflect.Required).
+		SetRequired(isFieldRequired(f.Desc.Options())).
 		SetSchema(s)
 
 	switch in {
