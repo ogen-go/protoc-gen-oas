@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 
 	"github.com/go-faster/errors"
 
@@ -78,6 +79,10 @@ func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error
 		propSchema, err := g.mkFieldSchema(f.Desc)
 		if err != nil {
 			return errors.Wrapf(err, "make field %q", f.Desc.FullName())
+		}
+
+		if opts, ok := f.Desc.Options().(*descriptorpb.FieldOptions); ok && opts != nil && opts.Deprecated != nil {
+			propSchema.Deprecated = *opts.Deprecated
 		}
 
 		prop := ogen.Property{
