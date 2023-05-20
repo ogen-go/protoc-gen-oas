@@ -193,7 +193,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		if !ok {
 			return "", errors.Errorf("unknown field %q", body)
 		}
-		required = isFieldRequired(f)
+		required = isFieldRequired(f.Desc.Options())
 
 		fieldSch, err := g.mkFieldSchema(f.Desc)
 		if err != nil {
