@@ -20,6 +20,7 @@ func run() error {
 	title := set.String("title", "", "Title")
 	description := set.String("description", "", "Description")
 	version := set.String("version", "", "Version")
+	proxy := set.Bool("proxy", false, "Generate generate gRPC proxy based on ogen")
 
 	if err := set.Parse(os.Args[1:]); err != nil {
 		return errors.Wrap(err, "parse args")
@@ -47,10 +48,15 @@ func run() error {
 		if err != nil {
 			return err
 		}
-
 		gf := plugin.NewGeneratedFile("openapi.yaml", "")
 		if _, err := gf.Write(bytes); err != nil {
 			return err
+		}
+
+		if *proxy {
+			if err := g.WriteProxy(plugin); err != nil {
+				return errors.Wrap(err, "write proxy")
+			}
 		}
 
 		return nil
