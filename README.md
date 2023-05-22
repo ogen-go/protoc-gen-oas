@@ -15,3 +15,69 @@ go install github.com/ogen-go/protoc-gen-oas/cmd/protoc-gen-oas
 ```console
 protoc --oas_out=. service.proto
 ```
+
+# Features
+
+- support [API annotations](https://github.com/googleapis/googleapis/blob/master/google/api/annotations.proto) in methods
+- support [field behavior](https://github.com/googleapis/googleapis/blob/master/google/api/field_behavior.proto) in message field description
+
+Example path param
+
+```protobuf
+syntax = "proto3";
+
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+
+service Service {
+  rpc GetItem(GetItemRequest) returns (Item) {
+    option (google.api.http) = {
+      get: "/api/v1/items/{id}"
+    };
+  }
+}
+
+message GetItemRequest {
+  string id = 1;
+}
+
+message Item {
+  string id = 1;
+  string name = 2;
+}
+```
+
+```yaml
+openapi: 3.1.0
+info:
+    title: Generated OpenAPI specification from proto file
+    version: v1.0.0
+paths:
+    /api/v1/items/{id}:
+        get:
+            operationId: getItem
+            parameters:
+                -   name: id
+                    in: path
+                    schema:
+                        type: string
+            responses:
+                "200":
+                    description: service.v1.Service.GetItem response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Item'
+components:
+    schemas:
+        Item:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+```
