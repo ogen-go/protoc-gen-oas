@@ -55,8 +55,8 @@ message Item {
 ```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
-    title: Generated OpenAPI specification from proto file
-    version: v1.0.0
+    title: ""
+    version: ""
 paths:
     /api/v1/items/{id}:
         get:
