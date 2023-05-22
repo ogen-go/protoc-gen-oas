@@ -21,9 +21,11 @@ protoc --oas_out=. service.proto
 - support [API annotations](https://github.com/googleapis/googleapis/blob/master/google/api/annotations.proto) in methods
 - support [field behavior](https://github.com/googleapis/googleapis/blob/master/google/api/field_behavior.proto) in message field description
 
-Example path param
+# Generate OpenAPI
 
-```protobuf
+## Path param
+
+```protobuf title="service.proto"
 syntax = "proto3";
 
 package service.v1;
@@ -50,7 +52,7 @@ message Item {
 }
 ```
 
-```yaml
+```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
     title: Generated OpenAPI specification from proto file
@@ -81,3 +83,25 @@ components:
                 name:
                     type: string
 ```
+
+## Query param
+
+```protobuf title="service.proto"
+
+```
+
+```yaml title="openapi.yaml"
+
+```
+
+## Mark field as required
+
+```protobuf title="service.proto"
+
+```
+
+```yaml title="openapi.yaml"
+
+```
+
+## Mark message/method/field as deprecated
