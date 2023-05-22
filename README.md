@@ -104,4 +104,12 @@ components:
 
 ```
 
-## Mark message/method/field as deprecated
+## Mark field as deprecated
+
+```protobuf title="service.proto"
+
+```
+
+```yaml title="openapi.yaml"
+
+```
