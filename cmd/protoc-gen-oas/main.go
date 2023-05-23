@@ -20,6 +20,7 @@ func run() error {
 	title := set.String("title", "", "Title")
 	description := set.String("description", "", "Description")
 	version := set.String("version", "", "Version")
+	indent := set.Int("indent", 2, "Indent")
 
 	if err := set.Parse(os.Args[1:]); err != nil {
 		return errors.Wrap(err, "parse args")
@@ -38,6 +39,7 @@ func run() error {
 			gen.WithSpecInfoTitle(*title),
 			gen.WithSpecInfoDescription(*description),
 			gen.WithSpecInfoVersion(*version),
+			gen.WithIndent(*indent),
 		)
 		if err != nil {
 			return err

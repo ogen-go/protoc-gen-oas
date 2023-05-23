@@ -1,50 +1,50 @@
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/bar/{query}:
-        get:
-            operationId: barMethod
-            parameters:
-                -   name: query
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-                -   name: id
-                    in: query
-                    schema:
-                        type: integer
-                        format: int64
-            responses:
-                "200":
-                    description: service.v1.Service.BarMethod response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
-    /api/v1/foo/{id}:
-        get:
-            operationId: fooMethod
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-                -   name: query
-                    in: query
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.FooMethod response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
+  /api/v1/bar/{query}:
+    get:
+      operationId: barMethod
+      parameters:
+        - name: query
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: service.v1.Service.BarMethod response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /api/v1/foo/{id}:
+    get:
+      operationId: fooMethod
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.FooMethod response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
 components:
-    schemas:
-        Response:
-            type: object
+  schemas:
+    Response:
+      type: object

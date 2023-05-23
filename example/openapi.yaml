@@ -1,194 +1,194 @@
 openapi: 3.1.0
 info:
-    title: Generated OpenAPI specification from proto file
-    version: v1.0.0
+  title: Generated OpenAPI specification from proto file
+  version: v1.0.0
 paths:
-    /api/v1/items:
-        get:
-            operationId: getItems
-            parameters:
-                -   name: limit
-                    in: query
-                    required: true
-                    schema:
-                        type: integer
-                        format: int32
-                -   name: offset
-                    in: query
-                    required: true
-                    schema:
-                        type: integer
-                        format: int32
-            responses:
-                "200":
-                    description: service.v1.Service.GetItems response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetItemsResponse'
-        post:
-            operationId: createItem
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateItemRequest'
-                required: true
-            responses:
-                "200":
-                    description: service.v1.Service.CreateItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Item'
-    /api/v1/items/{id}:
-        get:
-            operationId: getItem
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.GetItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Item'
-        put:
-            operationId: updateItem
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                name:
-                                    type: string
-                                type:
-                                    $ref: '#/components/schemas/ItemType'
-                            required:
-                                - name
-                                - type
-                required: true
-            responses:
-                "200":
-                    description: service.v1.Service.UpdateItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Item'
-        delete:
-            operationId: deleteItem
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.DeleteItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Empty'
-        patch:
-            operationId: patchItem
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                name:
-                                    type: string
-                                type:
-                                    $ref: '#/components/schemas/ItemType'
-                required: true
-            responses:
-                "200":
-                    description: service.v1.Service.PatchItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Item'
-components:
-    schemas:
-        CreateItemRequest:
-            type: object
-            properties:
-                name:
-                    type: string
-            required:
-                - name
-        Empty:
-            type: object
-        GetItemsResponse:
-            type: object
-            properties:
-                items:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Item'
-                totalCount:
-                    type: integer
-                    format: int32
-                nestedItem:
-                    $ref: '#/components/schemas/GetItemsResponse.NestedItem'
-            required:
-                - items
-                - totalCount
-        GetItemsResponse.NestedItem:
-            type: object
-            properties:
-                id:
-                    type: string
-                type:
-                    $ref: '#/components/schemas/ItemType'
-                name:
-                    type: string
-                createdAt:
-                    type: string
-                    format: date-time
-            required:
-                - id
-                - type
-                - name
-                - createdAt
-        Item:
-            type: object
-            properties:
-                id:
-                    type: string
-                type:
-                    $ref: '#/components/schemas/ItemType'
-                name:
-                    type: string
-                createdAt:
-                    type: string
-                    format: date-time
-            required:
-                - id
-                - type
-                - name
-                - createdAt
-        ItemType:
+  /api/v1/items:
+    get:
+      operationId: getItems
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: service.v1.Service.GetItems response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetItemsResponse'
+    post:
+      operationId: createItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItemRequest'
+        required: true
+      responses:
+        "200":
+          description: service.v1.Service.CreateItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+  /api/v1/items/{id}:
+    get:
+      operationId: getItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
             type: string
-            enum:
-                - ITEM_TYPE_UNSPECIFIED
-                - ITEM_TYPE_BASIC
+      responses:
+        "200":
+          description: service.v1.Service.GetItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+    put:
+      operationId: updateItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  $ref: '#/components/schemas/ItemType'
+              required:
+                - name
+                - type
+        required: true
+      responses:
+        "200":
+          description: service.v1.Service.UpdateItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+    delete:
+      operationId: deleteItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.DeleteItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
+    patch:
+      operationId: patchItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  $ref: '#/components/schemas/ItemType'
+        required: true
+      responses:
+        "200":
+          description: service.v1.Service.PatchItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+components:
+  schemas:
+    CreateItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    Empty:
+      type: object
+    GetItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        totalCount:
+          type: integer
+          format: int32
+        nestedItem:
+          $ref: '#/components/schemas/GetItemsResponse.NestedItem'
+      required:
+        - items
+        - totalCount
+    GetItemsResponse.NestedItem:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/ItemType'
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - type
+        - name
+        - createdAt
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/ItemType'
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - type
+        - name
+        - createdAt
+    ItemType:
+      type: string
+      enum:
+        - ITEM_TYPE_UNSPECIFIED
+        - ITEM_TYPE_BASIC

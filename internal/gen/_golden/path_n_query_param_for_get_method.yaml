@@ -1,29 +1,29 @@
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/{id}:
-        get:
-            operationId: getMethod
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-                -   name: query
-                    in: query
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.GetMethod response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
+  /api/v1/{id}:
+    get:
+      operationId: getMethod
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.GetMethod response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
 components:
-    schemas:
-        Response:
-            type: object
+  schemas:
+    Response:
+      type: object

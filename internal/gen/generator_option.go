@@ -30,3 +30,10 @@ func WithSpecInfoVersion(version string) GeneratorOption {
 		g.spec.Info.SetVersion(version)
 	}
 }
+
+// WithIndent sets indent.
+func WithIndent(indent int) GeneratorOption {
+	return func(g *Generator) {
+		g.indent = indent
+	}
+}
