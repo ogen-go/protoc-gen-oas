@@ -104,7 +104,7 @@ service Service {
 }
 
 message GetItemsRequest {
-  int32 limit = 1; // <--
+  int32 limit = 1;  // <--
   int32 offset = 2; // <--
 }
 
@@ -130,12 +130,12 @@ paths:
             operationId: getItems
             parameters:
                 -   name: limit # <--
-                    in: query
+                    in: query   # <--
                     schema:
                         type: integer
                         format: int32
                 -   name: offset # <--
-                    in: query
+                    in: query    # <--
                     schema:
                         type: integer
                         format: int32
@@ -170,11 +170,63 @@ components:
 ## Mark field as required
 
 ```protobuf title="service.proto"
+syntax = "proto3";
 
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+
+service Service {
+    rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/api/v1/items/{id}"
+            body: "*"
+        };
+    }
+}
+
+message DeleteItemRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED]; // <--
+}
 ```
 
 ```yaml title="openapi.yaml"
-
+openapi: 3.1.0
+info:
+    title: ""
+    version: ""
+paths:
+    /api/v1/items/{id}:
+        delete:
+            operationId: deleteItem
+            parameters:
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                "200":
+                    description: service.v1.Service.DeleteItem response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Empty'
+components:
+    schemas:
+        CreateItemRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+            required:  # <--
+                - name # <--
+        Empty:
+            type: object
 ```
 
 ## Mark field as deprecated
