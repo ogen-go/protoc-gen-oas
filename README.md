@@ -87,11 +87,84 @@ components:
 ## Query param
 
 ```protobuf title="service.proto"
+syntax = "proto3";
 
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+
+service Service {
+    rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/items"
+        };
+    }
+}
+
+message GetItemsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message GetItemsResponse {
+  repeated Item items = 1;
+  int32 total_count = 2;
+}
+
+message Item {
+  string id = 1;
+  string name = 2;
+}
 ```
 
 ```yaml title="openapi.yaml"
-
+openapi: 3.1.0
+info:
+    title: ""
+    version: ""
+paths:
+    /api/v1/items:
+        get:
+            operationId: getItems
+            parameters:
+                -   name: limit
+                    in: query
+                    schema:
+                        type: integer
+                        format: int32
+                -   name: offset
+                    in: query
+                    schema:
+                        type: integer
+                        format: int32
+            responses:
+                "200":
+                    description: service.v1.Service.GetItems response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetItemsResponse'
+components:
+    schemas:
+        GetItemsResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Item'
+                totalCount:
+                    type: integer
+                    format: int32
+        Item:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
 ```
 
 ## Mark field as required
