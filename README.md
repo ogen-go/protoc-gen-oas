@@ -37,7 +37,7 @@ import "google/api/annotations.proto";
 service Service {
   rpc GetItem(GetItemRequest) returns (Item) {
     option (google.api.http) = {
-      get: "/api/v1/items/{id}"
+      get: "/api/v1/items/{id}" // <--
     };
   }
 }
@@ -62,7 +62,7 @@ paths:
         get:
             operationId: getItem
             parameters:
-                -   name: id
+                -   name: id # <--
                     in: path
                     schema:
                         type: string
@@ -104,8 +104,8 @@ service Service {
 }
 
 message GetItemsRequest {
-  int32 limit = 1;
-  int32 offset = 2;
+  int32 limit = 1; // <--
+  int32 offset = 2; // <--
 }
 
 message GetItemsResponse {
@@ -129,12 +129,12 @@ paths:
         get:
             operationId: getItems
             parameters:
-                -   name: limit
+                -   name: limit # <--
                     in: query
                     schema:
                         type: integer
                         format: int32
-                -   name: offset
+                -   name: offset # <--
                     in: query
                     schema:
                         type: integer
