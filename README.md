@@ -55,33 +55,33 @@ message Item {
 ```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/items/{id}:
-        get:
-            operationId: getItem
-            parameters:
-                -   name: id # <--
-                    in: path # <--
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.GetItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Item'
+  /api/v1/items/{id}:
+    get:
+      operationId: getItem
+      parameters:
+        - name: id # <--
+          in: path # <--
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.GetItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
 components:
-    schemas:
-        Item:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
 ```
 
 ## Query param
@@ -96,11 +96,11 @@ option go_package = "service/v1;service";
 import "google/api/annotations.proto";
 
 service Service {
-    rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/items"
-        };
-    }
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/items"
+    };
+  }
 }
 
 message GetItemsRequest {
@@ -122,49 +122,49 @@ message Item {
 ```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/items:
-        get:
-            operationId: getItems
-            parameters:
-                -   name: limit # <--
-                    in: query   # <--
-                    schema:
-                        type: integer
-                        format: int32
-                -   name: offset # <--
-                    in: query    # <--
-                    schema:
-                        type: integer
-                        format: int32
-            responses:
-                "200":
-                    description: service.v1.Service.GetItems response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetItemsResponse'
+  /api/v1/items:
+    get:
+      operationId: getItems
+      parameters:
+        - name: limit # <--
+          in: query   # <--
+          schema:
+            type: integer
+            format: int32
+        - name: offset # <--
+          in: query  # <--
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: service.v1.Service.GetItems response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetItemsResponse'
 components:
-    schemas:
-        GetItemsResponse:
-            type: object
-            properties:
-                items:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Item'
-                totalCount:
-                    type: integer
-                    format: int32
-        Item:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
+  schemas:
+    GetItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        totalCount:
+          type: integer
+          format: int32
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
 ```
 
 ## Mark field as required
@@ -181,12 +181,12 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
 service Service {
-    rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/api/v1/items/{id}"
-            body: "*"
-        };
-    }
+  rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/items/{id}"
+      body: "*"
+    };
+  }
 }
 
 message DeleteItemRequest {
@@ -197,36 +197,36 @@ message DeleteItemRequest {
 ```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/items/{id}:
-        delete:
-            operationId: deleteItem
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.DeleteItem response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Empty'
+  /api/v1/items/{id}:
+    delete:
+      operationId: deleteItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.DeleteItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
 components:
-    schemas:
-        CreateItemRequest:
-            type: object
-            properties:
-                name:
-                    type: string
-            required:  # <--
-                - name # <--
-        Empty:
-            type: object
+  schemas:
+    CreateItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:  # <--
+        - name # <--
+    Empty:
+      type: object
 ```
 
 ## Mark field as deprecated
@@ -267,49 +267,49 @@ message Item {
 ```yaml title="openapi.yaml"
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/items:
-        get:
-            operationId: getItems
-            parameters:
-                -   name: limit
-                    in: query
-                    schema:
-                        type: integer
-                        format: int32
-                -   name: offset
-                    in: query
-                    schema:
-                        type: integer
-                        format: int32
-                        deprecated: true # <--
-            responses:
-                "200":
-                    description: service.v1.Service.GetItems response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/GetItemsResponse'
+  /api/v1/items:
+    get:
+      operationId: getItems
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            format: int32
+            deprecated: true # <--
+      responses:
+        "200":
+          description: service.v1.Service.GetItems response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetItemsResponse'
 components:
-    schemas:
-        GetItemsResponse:
-            type: object
-            properties:
-                items:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Item'
-                totalCount:
-                    type: integer
-                    format: int32
-        Item:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
-                    deprecated: true # <--
+  schemas:
+    GetItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        totalCount:
+          type: integer
+          format: int32
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          deprecated: true # <--
 ```
