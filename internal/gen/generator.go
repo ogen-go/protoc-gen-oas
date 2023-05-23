@@ -1,6 +1,7 @@
 package gen
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -78,12 +79,22 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 // Generator instance.
 type Generator struct {
-	spec *ogen.Spec
+	spec   *ogen.Spec
+	indent int
 }
 
 // YAML returns OpenAPI specification bytes.
 func (g *Generator) YAML() ([]byte, error) {
-	return yaml.Marshal(g.spec)
+	var buf bytes.Buffer
+
+	enc := yaml.NewEncoder(&buf)
+	enc.SetIndent(g.indent)
+
+	if err := enc.Encode(g.spec); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 // JSON returns OpenAPI specification bytes.

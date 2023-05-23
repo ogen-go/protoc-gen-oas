@@ -1,76 +1,76 @@
 openapi: 3.1.0
 info:
-    title: ""
-    version: ""
+  title: ""
+  version: ""
 paths:
-    /api/v1/{id}:
-        put:
-            operationId: barMethod
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                body:
-                                    type: string
-                                query:
-                                    type: string
-                required: true
-            responses:
-                "200":
-                    description: service.v1.Service.BarMethod response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
-        post:
-            operationId: fooMethod
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-                -   name: query
-                    in: query
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: string
-            responses:
-                "200":
-                    description: service.v1.Service.FooMethod response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
-    /api/v1/single_field/{id}:
-        post:
-            operationId: singleFieldInPath
-            parameters:
-                -   name: id
-                    in: path
-                    required: true
-                    schema:
-                        type: string
-            responses:
-                "200":
-                    description: service.v1.Service.SingleFieldInPath response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Response'
+  /api/v1/{id}:
+    put:
+      operationId: barMethod
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                query:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: service.v1.Service.BarMethod response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+    post:
+      operationId: fooMethod
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: service.v1.Service.FooMethod response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /api/v1/single_field/{id}:
+    post:
+      operationId: singleFieldInPath
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: service.v1.Service.SingleFieldInPath response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
 components:
-    schemas:
-        Response:
-            type: object
+  schemas:
+    Response:
+      type: object

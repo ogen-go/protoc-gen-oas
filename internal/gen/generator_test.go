@@ -56,7 +56,7 @@ func TestNewGenerator(t *testing.T) {
 				p.Files[i].Generate = true
 			}
 
-			g, err := NewGenerator(p.Files, WithSpecOpenAPI("3.1.0"))
+			g, err := NewGenerator(p.Files, WithSpecOpenAPI("3.1.0"), WithIndent(2))
 			require.NoError(t, err)
 
 			yaml, err := g.YAML()
