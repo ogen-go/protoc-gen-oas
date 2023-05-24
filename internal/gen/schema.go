@@ -109,43 +109,43 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 
 	switch kind := fd.Kind(); kind {
 	case protoreflect.BoolKind:
-		return &ogen.Schema{Type: "boolean", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.Int32Kind,
 		protoreflect.Sint32Kind,
 		protoreflect.Sfixed32Kind:
-		return &ogen.Schema{Type: "integer", Format: "int32", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("integer").SetFormat("int32").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.Uint32Kind,
 		protoreflect.Fixed32Kind:
-		return &ogen.Schema{Type: "integer", Format: "uint32", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.Int64Kind,
 		protoreflect.Sint64Kind,
 		protoreflect.Sfixed64Kind:
-		return &ogen.Schema{Type: "integer", Format: "int64", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.Uint64Kind,
 		protoreflect.Fixed64Kind:
-		return &ogen.Schema{Type: "integer", Format: "uint64", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.FloatKind:
-		return &ogen.Schema{Type: "number", Format: "float", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("number").SetFormat("float").SetDeprecated(isDeprecated(fd.Options())), nil
 	case protoreflect.DoubleKind:
-		return &ogen.Schema{Type: "number", Format: "double", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("number").SetFormat("double").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.StringKind:
-		return &ogen.Schema{Type: "string", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())), nil
 	case protoreflect.BytesKind:
 		// Go's protojson encodes binary data as base64 string.
 		//
 		//	https://github.com/protocolbuffers/protobuf-go/blob/f221882bfb484564f1714ae05f197dea2c76898d/encoding/protojson/encode.go#L287-L288
 		//
 		// Do the same here.
-		return &ogen.Schema{Type: "string", Format: "base64", Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetType("string").SetFormat("base64").SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.EnumKind:
-		return &ogen.Schema{Ref: descriptorRef(fd.Enum()), Deprecated: isDeprecated(fd.Options())}, nil
+		return ogen.NewSchema().SetRef(descriptorRef(fd.Enum())).SetDeprecated(isDeprecated(fd.Options())), nil
 
 	case protoreflect.MessageKind:
 		msg := fd.Message()
@@ -177,7 +177,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 			}
 
 			// User-defined type.
-			return &ogen.Schema{Ref: descriptorRef(msg), Deprecated: isDeprecated(fd.Options())}, nil
+			return ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecated(fd.Options())), nil
 		}
 	default: // protoreflect.GroupKind
 		return nil, errors.Errorf("unsupported kind: %s", kind)
@@ -189,38 +189,38 @@ func (g *Generator) mkWellKnownPrimitive(msg protoreflect.MessageDescriptor) (s 
 	case "google.protobuf":
 		switch msg.Name() {
 		case "BoolValue":
-			return &ogen.Schema{Type: "boolean", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("boolean").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 
 		case "Int32Value":
-			return &ogen.Schema{Type: "integer", Format: "int32", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("integer").SetFormat("int32").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "UInt32Value":
-			return &ogen.Schema{Type: "integer", Format: "uint32", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 
 		case "Int64Value":
-			return &ogen.Schema{Type: "integer", Format: "int64", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("integer").SetFormat("int64").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "UInt64Value":
-			return &ogen.Schema{Type: "integer", Format: "uint64", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 
 		case "FloatValue":
-			return &ogen.Schema{Type: "number", Format: "float", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("number").SetFormat("float").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "DoubleValue":
-			return &ogen.Schema{Type: "number", Format: "double", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("number").SetFormat("double").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 
 		case "StringValue":
-			return &ogen.Schema{Type: "string", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("string").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "BytesValue":
 			// Go's protojson encodes binary data as base64 string.
 			//
 			//	https://github.com/protocolbuffers/protobuf-go/blob/f221882bfb484564f1714ae05f197dea2c76898d/encoding/protojson/encode.go#L287-L288
 			//
 			// Do the same here.
-			return &ogen.Schema{Type: "string", Format: "base64", Nullable: true, Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("string").SetFormat("base64").SetNullable(true).SetDeprecated(isDeprecated(msg.Options())), true, nil
 
 		case "Duration":
-			return &ogen.Schema{Type: "string", Format: "duration", Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("string").SetFormat("duration").SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "Timestamp":
 			// FIXME(tdakkota): protojson uses RFC 3339
-			return &ogen.Schema{Type: "string", Format: "date-time", Deprecated: isDeprecated(msg.Options())}, true, nil
+			return ogen.NewSchema().SetType("string").SetFormat("date-time").SetDeprecated(isDeprecated(msg.Options())), true, nil
 		case "Any",
 			"Value",
 			"NullValue",
