@@ -1,7 +1,5 @@
 # protoc-gen-oas [![Go Reference](https://img.shields.io/badge/go-pkg-00ADD8)](https://pkg.go.dev/github.com/ogen-go/protoc-gen-oas#section-documentation) [![codecov](https://img.shields.io/codecov/c/github/ogen-go/protoc-gen-oas?label=cover)](https://codecov.io/gh/ogen-go/protoc-gen-oas) [![experimental](https://img.shields.io/badge/-experimental-blueviolet)](https://go-faster.org/docs/projects/status#experimental)
 
-Work in progress.
-
 `protoc-gen-oas` is protoc plugin for generate OpenAPI v3.x.x from proto files.
 
 # Install
@@ -62,10 +60,10 @@ paths:
     get:
       operationId: getItem
       parameters:
-        - name: id # <--
-          in: path # <--
-          schema:
-            type: string
+        - name: id       # <--
+          in: path       # <--
+          schema:        # <--
+            type: string # <--
       responses:
         "200":
           description: service.v1.Service.GetItem response
@@ -129,16 +127,16 @@ paths:
     get:
       operationId: getItems
       parameters:
-        - name: limit # <--
-          in: query   # <--
-          schema:
-            type: integer
-            format: int32
-        - name: offset # <--
-          in: query  # <--
-          schema:
-            type: integer
-            format: int32
+        - name: limit     # <--
+          in: query       # <--
+          schema:         # <--
+            type: integer # <--
+            format: int32 # <--
+        - name: offset    # <--
+          in: query       # <--
+          schema:         # <--
+            type: integer # <--
+            format: int32 # <--
       responses:
         "200":
           description: service.v1.Service.GetItems response
@@ -221,10 +219,10 @@ components:
     CreateItemRequest:
       type: object
       properties:
-        name:
-          type: string
-      required:  # <--
-        - name # <--
+        name:          # <--
+          type: string # <--
+      required:        # <--
+        - name         # <--
     Empty:
       type: object
 ```
@@ -279,11 +277,11 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: offset
-          in: query
-          schema:
-            type: integer
-            format: int32
+        - name: offset       # <--
+          in: query          # <--
+          schema:            # <--
+            type: integer    # <--
+            format: int32    # <--
             deprecated: true # <--
       responses:
         "200":
@@ -309,7 +307,7 @@ components:
       properties:
         id:
           type: string
-        name:
-          type: string
+        name:              # <--
+          type: string     # <--
           deprecated: true # <--
 ```
