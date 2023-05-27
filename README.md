@@ -4,13 +4,13 @@
 
 # Install
 
-```console
+```shell
 go install github.com/ogen-go/protoc-gen-oas/cmd/protoc-gen-oas
 ```
 
 # Usage
 
-```console
+```shell
 protoc --oas_out=. service.proto
 ```
 
