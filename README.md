@@ -62,6 +62,7 @@ paths:
       parameters:
         - name: id       # <--
           in: path       # <--
+          required: true # <--
           schema:        # <--
             type: string # <--
       responses:
@@ -202,11 +203,11 @@ paths:
     delete:
       operationId: deleteItem
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - name: id       # <--
+          in: path       # <--
+          required: true # <--
+          schema:        # <--
+            type: string # <--
       responses:
         "200":
           description: service.v1.Service.DeleteItem response
@@ -216,13 +217,6 @@ paths:
                 $ref: '#/components/schemas/Empty'
 components:
   schemas:
-    CreateItemRequest:
-      type: object
-      properties:
-        name:          # <--
-          type: string # <--
-      required:        # <--
-        - name         # <--
     Empty:
       type: object
 ```
@@ -310,4 +304,58 @@ components:
         name:              # <--
           type: string     # <--
           deprecated: true # <--
+```
+
+## Snake case
+
+```protobuf title="service.proto"
+syntax = "proto3";
+
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Service {
+  rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/items/{item_id}"
+      body: "*"
+    };
+  }
+}
+
+message DeleteItemRequest {
+  string item_id = 1 [json_name = "item_id"]; // <--
+}
+```
+
+```yaml title="openapi.yaml"
+openapi: 3.1.0
+info:
+  title: ""
+  version: ""
+paths:
+  /api/v1/items/{item_id}:
+    delete:
+      operationId: deleteItem
+      parameters:
+        - name: item_id  # <--
+          in: path       # <--
+          required: true # <--
+          schema:        # <--
+            type: string # <--
+      responses:
+        "200":
+          description: service.v1.Service.DeleteItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
+components:
+  schemas:
+    Empty:
+      type: object
 ```
