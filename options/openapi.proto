@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package protoc_gen_oas.options;
+
+option go_package = "github.com/ogen-go/protoc-gen-oas/options";
+
+message Schema {
+  string Summary = 1;
+  string Description = 2;
+}

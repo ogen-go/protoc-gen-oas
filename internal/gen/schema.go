@@ -6,12 +6,14 @@ import (
 	"strings"
 
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"github.com/go-faster/errors"
 
 	"github.com/ogen-go/ogen"
+	"github.com/ogen-go/protoc-gen-oas/options"
 )
 
 func (g *Generator) mkEnum(e *protogen.Enum) error {
@@ -109,7 +111,9 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 
 	switch kind := fd.Kind(); kind {
 	case protoreflect.BoolKind:
-		return ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options())), nil
+		ss := ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options()))
+		ss.Summary = optSummary(fd.Options())
+		return ss, nil
 
 	case protoreflect.Int32Kind,
 		protoreflect.Sint32Kind,
@@ -266,4 +270,17 @@ func isDeprecated(opts protoreflect.ProtoMessage) bool {
 		return *opts.Deprecated
 	}
 	return false
+}
+
+func optSummary(opts protoreflect.ProtoMessage) string {
+	if s, ok := optSchema(opts); ok {
+		return s.Summary
+	}
+	return ""
+}
+
+func optSchema(opts protoreflect.ProtoMessage) (s *options.Schema, ok bool) {
+	s, ok = proto.GetExtension(opts, options.E_OpenapiField).(*options.Schema)
+	ok = ok && s != nil
+	return s, ok
 }
