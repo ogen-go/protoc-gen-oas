@@ -111,45 +111,43 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 
 	switch kind := fd.Kind(); kind {
 	case protoreflect.BoolKind:
-		ss := ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options()))
-		ss.Summary = optSummary(fd.Options())
-		return ss, nil
+		s = ogen.NewSchema().SetType("boolean")
 
 	case protoreflect.Int32Kind,
 		protoreflect.Sint32Kind,
 		protoreflect.Sfixed32Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("int32").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("integer").SetFormat("int32")
 
 	case protoreflect.Uint32Kind,
 		protoreflect.Fixed32Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("integer").SetFormat("uint32")
 
 	case protoreflect.Int64Kind,
 		protoreflect.Sint64Kind,
 		protoreflect.Sfixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("integer").SetFormat("int64")
 
 	case protoreflect.Uint64Kind,
 		protoreflect.Fixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("integer").SetFormat("uint64")
 
 	case protoreflect.FloatKind:
-		return ogen.NewSchema().SetType("number").SetFormat("float").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("number").SetFormat("float")
 	case protoreflect.DoubleKind:
-		return ogen.NewSchema().SetType("number").SetFormat("double").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("number").SetFormat("double")
 
 	case protoreflect.StringKind:
-		return ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("string")
 	case protoreflect.BytesKind:
 		// Go's protojson encodes binary data as base64 string.
 		//
 		//	https://github.com/protocolbuffers/protobuf-go/blob/f221882bfb484564f1714ae05f197dea2c76898d/encoding/protojson/encode.go#L287-L288
 		//
 		// Do the same here.
-		return ogen.NewSchema().SetType("string").SetFormat("base64").SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetType("string").SetFormat("base64")
 
 	case protoreflect.EnumKind:
-		return ogen.NewSchema().SetRef(descriptorRef(fd.Enum())).SetDeprecated(isDeprecated(fd.Options())), nil
+		s = ogen.NewSchema().SetRef(descriptorRef(fd.Enum()))
 
 	case protoreflect.MessageKind:
 		msg := fd.Message()
@@ -177,15 +175,22 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 				s.AdditionalProperties = &ogen.AdditionalProperties{
 					Schema: *elem,
 				}
-				return s, nil
+			} else {
+				// User-defined type.
+				s = ogen.NewSchema().SetRef(descriptorRef(msg))
 			}
-
-			// User-defined type.
-			return ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecated(fd.Options())), nil
 		}
 	default: // protoreflect.GroupKind
 		return nil, errors.Errorf("unsupported kind: %s", kind)
 	}
+
+	if fds, ok := fieldOptionSchema(fd.Options()); ok {
+		s.SetDescription(fds.Description).
+			SetMaximum(fds.Maximum).
+			SetExclusiveMaximum(fds.ExclusiveMaximum)
+	}
+
+	return s.SetDeprecated(isDeprecated(fd.Options())), nil
 }
 
 func (g *Generator) mkWellKnownPrimitive(msg protoreflect.MessageDescriptor) (s *ogen.Schema, ok bool, _ error) {
@@ -272,15 +277,8 @@ func isDeprecated(opts protoreflect.ProtoMessage) bool {
 	return false
 }
 
-func optSummary(opts protoreflect.ProtoMessage) string {
-	if s, ok := optSchema(opts); ok {
-		return s.Summary
-	}
-	return ""
-}
-
-func optSchema(opts protoreflect.ProtoMessage) (s *options.Schema, ok bool) {
-	s, ok = proto.GetExtension(opts, options.E_OpenapiField).(*options.Schema)
+func fieldOptionSchema(opts protoreflect.ProtoMessage) (s *options.Schema, ok bool) {
+	s, ok = proto.GetExtension(opts, options.E_Field).(*options.Schema)
 	ok = ok && s != nil
 	return s, ok
 }
