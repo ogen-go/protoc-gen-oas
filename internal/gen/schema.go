@@ -11,8 +11,8 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen"
+
 	"github.com/ogen-go/protoc-gen-oas/options"
 )
 
