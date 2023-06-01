@@ -5,7 +5,7 @@
 # Install
 
 ```shell
-go install github.com/ogen-go/protoc-gen-oas/cmd/protoc-gen-oas
+go install github.com/ogen-go/protoc-gen-oas/cmd/protoc-gen-oas@latest
 ```
 
 # Usage
