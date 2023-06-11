@@ -1,7 +1,6 @@
 package gen
 
 import (
-	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -66,7 +65,7 @@ func CamelCase[S ~string](s S) string {
 
 // LowerCamelCase returns the lowerCamelCased name.
 func LowerCamelCase[S ~string](s S) string {
-	return Decapitalize(CamelCase(s))
+	return Uncapitalize(CamelCase(s))
 }
 
 // Capitalize converts first character to upper.
@@ -80,19 +79,13 @@ func Capitalize(s string) string {
 	return string(unicode.ToUpper(r)) + s[size:]
 }
 
-// Decapitalize converts first character to lower.
+// Uncapitalize converts first character to lower.
 //
 // If the string is invalid UTF-8 or empty, it is returned as is.
-func Decapitalize(s string) string {
+func Uncapitalize(s string) string {
 	r, size := utf8.DecodeRuneInString(s)
 	if r == utf8.RuneError {
 		return s
 	}
 	return string(unicode.ToLower(r)) + s[size:]
-}
-
-// LastAfterDots returns last word from string with word split dots.
-func LastAfterDots(s string) string {
-	words := strings.Split(s, ".")
-	return words[len(words)-1]
 }
