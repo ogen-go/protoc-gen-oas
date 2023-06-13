@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package protocgenoas.options;
+
+option go_package = "github.com/ogen-go/protoc-gen-oas/options";
+
+import "google/protobuf/descriptor.proto";
+
+message Schema {
+  string summary = 1;
+  string description = 2;
+  optional int64 maximum = 3;
+  bool exclusive_maximum = 4;
+}
+
+extend google.protobuf.FieldOptions {
+  Schema field = 1042;
+}
