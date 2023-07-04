@@ -300,7 +300,7 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 	walkFields = func(prefix string, fields []*protogen.Field) error {
 		for _, f := range fields {
 			fd := f.Desc
-			name := prefix + fd.TextName()
+			name := prefix + fd.JSONName()
 
 			switch kind := fd.Kind(); kind {
 			case protoreflect.MessageKind:

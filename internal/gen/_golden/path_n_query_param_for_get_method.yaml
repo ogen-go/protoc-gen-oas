@@ -16,6 +16,10 @@ paths:
           in: query
           schema:
             type: string
+        - name: queryParam
+          in: query
+          schema:
+            type: string
       responses:
         "200":
           description: service.v1.Service.GetMethod response

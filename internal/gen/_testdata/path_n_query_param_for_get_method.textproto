@@ -17,6 +17,13 @@ proto_file: {
       type: TYPE_STRING
       json_name: "query"
     }
+    field: {
+      name: "query_param"
+      number: 3
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "queryParam"
+    }
   }
   message_type: {
     name: "Response"
