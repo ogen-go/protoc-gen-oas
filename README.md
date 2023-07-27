@@ -177,18 +177,21 @@ option go_package = "service/v1;service";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "google/protobuf/empty.proto";
 
 service Service {
-  rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/items/{id}"
+      post: "/api/v1/items"
       body: "*"
     };
   }
 }
 
-message DeleteItemRequest {
+message CreateItemRequest {
+  string name = 1 [(google.api.field_behavior) = REQUIRED]; // <--
+}
+
+message CreateItemResponse {
   string id = 1 [(google.api.field_behavior) = REQUIRED]; // <--
 }
 ```
@@ -199,26 +202,38 @@ info:
   title: ""
   version: ""
 paths:
-  /api/v1/items/{id}:
-    delete:
-      operationId: deleteItem
-      parameters:
-        - name: id       # <--
-          in: path       # <--
-          required: true # <--
-          schema:        # <--
-            type: string # <--
+  /api/v1/items:
+    post:
+      operationId: createItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItemRequest'
+        required: true
       responses:
         "200":
-          description: service.v1.Service.DeleteItem response
+          description: service.v1.Service.CreateItem response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Empty'
+                $ref: '#/components/schemas/CreateItemResponse'
 components:
   schemas:
-    Empty:
+    CreateItemRequest:
       type: object
+      properties:
+        name:
+          type: string
+      required: # <--
+        - name  # <--
+    CreateItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+      required: # <--
+        - id    # <--
 ```
 
 ## Mark field as deprecated
