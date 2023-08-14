@@ -270,6 +270,8 @@ func isDeprecated(opts protoreflect.ProtoMessage) bool {
 	return false
 }
 
-func mkDescription(description string) string {
-	return strings.TrimSpace(description)
+func mkDescription(description string) (d string) {
+	d = strings.TrimSpace(description)
+	d = strings.TrimLeft(d, "// ")
+	return d
 }
