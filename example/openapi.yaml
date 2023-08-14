@@ -180,6 +180,7 @@ components:
         name:
           type: string
         createdAt:
+          description: Datetime when item was created.
           type: string
           format: date-time
       required:

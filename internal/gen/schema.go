@@ -76,7 +76,7 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 
 func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error {
 	for _, f := range fields {
-		propSchema, err := g.mkFieldSchema(f.Desc)
+		propSchema, err := g.mkFieldSchema(f.Desc, f.Comments.Trailing.String())
 		if err != nil {
 			return errors.Wrapf(err, "make field %q", f.Desc.FullName())
 		}
@@ -94,7 +94,7 @@ func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error
 	return nil
 }
 
-func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Schema, rerr error) {
+func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description string) (s *ogen.Schema, rerr error) {
 	defer func() {
 		if rerr != nil {
 			return
@@ -109,43 +109,43 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 
 	switch kind := fd.Kind(); kind {
 	case protoreflect.BoolKind:
-		return ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("boolean").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.Int32Kind,
 		protoreflect.Sint32Kind,
 		protoreflect.Sfixed32Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("int32").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("integer").SetFormat("int32").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.Uint32Kind,
 		protoreflect.Fixed32Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.Int64Kind,
 		protoreflect.Sint64Kind,
 		protoreflect.Sfixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.Uint64Kind,
 		protoreflect.Fixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.FloatKind:
-		return ogen.NewSchema().SetType("number").SetFormat("float").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("number").SetFormat("float").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 	case protoreflect.DoubleKind:
-		return ogen.NewSchema().SetType("number").SetFormat("double").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("number").SetFormat("double").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.StringKind:
-		return ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 	case protoreflect.BytesKind:
 		// Go's protojson encodes binary data as base64 string.
 		//
 		//	https://github.com/protocolbuffers/protobuf-go/blob/f221882bfb484564f1714ae05f197dea2c76898d/encoding/protojson/encode.go#L287-L288
 		//
 		// Do the same here.
-		return ogen.NewSchema().SetType("string").SetFormat("base64").SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetType("string").SetFormat("base64").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.EnumKind:
-		return ogen.NewSchema().SetRef(descriptorRef(fd.Enum())).SetDeprecated(isDeprecated(fd.Options())), nil
+		return ogen.NewSchema().SetRef(descriptorRef(fd.Enum())).SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.MessageKind:
 		msg := fd.Message()
@@ -157,6 +157,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 			return nil, err
 		case ok:
 			// Well-known type.
+			wkt.SetDescription(mkDescription(description))
 			return wkt, nil
 		default:
 			if fd.IsMap() {
@@ -164,7 +165,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
 				}
 
-				elem, err := g.mkFieldSchema(fd.MapValue())
+				elem, err := g.mkFieldSchema(fd.MapValue(), "")
 				if err != nil {
 					return nil, errors.Wrap(err, "make map key")
 				}
@@ -173,11 +174,12 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor) (s *ogen.Sche
 				s.AdditionalProperties = &ogen.AdditionalProperties{
 					Schema: *elem,
 				}
+				s.SetDescription(mkDescription(description))
 				return s, nil
 			}
 
 			// User-defined type.
-			return ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecated(fd.Options())), nil
+			return ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 		}
 	default: // protoreflect.GroupKind
 		return nil, errors.Errorf("unsupported kind: %s", kind)
@@ -266,4 +268,10 @@ func isDeprecated(opts protoreflect.ProtoMessage) bool {
 		return *opts.Deprecated
 	}
 	return false
+}
+
+func mkDescription(description string) (d string) {
+	d = strings.TrimSpace(description)
+	d = strings.TrimLeft(d, "// ")
+	return d
 }
