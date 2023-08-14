@@ -206,7 +206,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		}
 		required = isFieldRequired(f.Desc.Options())
 
-		fieldSch, err := g.mkFieldSchema(f.Desc)
+		fieldSch, err := g.mkFieldSchema(f.Desc, f.Comments.Trailing.String())
 		if err != nil {
 			return "", errors.Wrapf(err, "make requestBody schema (field: %q)", body)
 		}
@@ -258,7 +258,7 @@ func (g *Generator) mkOutput(rule HTTPRule, m *protogen.Method, op *ogen.Operati
 			return errors.Errorf("unknown field %q", body)
 		}
 
-		fieldSch, err := g.mkFieldSchema(f.Desc)
+		fieldSch, err := g.mkFieldSchema(f.Desc, f.Comments.Leading.String())
 		if err != nil {
 			return errors.Wrapf(err, "make response schema (field: %q)", body)
 		}
@@ -349,7 +349,7 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 }
 
 func (g *Generator) mkParameter(in, name string, f *protogen.Field) (*ogen.Parameter, error) {
-	s, err := g.mkFieldSchema(f.Desc)
+	s, err := g.mkFieldSchema(f.Desc, f.Comments.Trailing.String())
 	if err != nil {
 		return nil, errors.Wrapf(err, "generate %s parameter %q", in, f.Desc.Name())
 	}
