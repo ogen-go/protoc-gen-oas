@@ -272,6 +272,6 @@ func isDeprecated(opts protoreflect.ProtoMessage) bool {
 
 func mkDescription(description string) (d string) {
 	d = strings.TrimSpace(description)
-	d = strings.TrimLeft(d, "// ")
+	d = strings.TrimLeft(d, "/ ")
 	return d
 }
