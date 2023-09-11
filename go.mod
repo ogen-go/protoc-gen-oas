@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/go-faster/errors v0.6.1
-	github.com/go-faster/sdk v0.9.1
+	github.com/go-faster/sdk v0.9.2
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v0.73.0
 	github.com/stretchr/testify v1.8.4
