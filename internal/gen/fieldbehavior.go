@@ -1,6 +1,8 @@
 package gen
 
 import (
+	"slices"
+
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -16,11 +18,5 @@ func isFieldBehaviorIndicator(opts protoreflect.ProtoMessage, indicator annotati
 		return false
 	}
 
-	for _, fieldBehavior := range fieldBehaviors {
-		if fieldBehavior == indicator {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(fieldBehaviors, indicator)
 }

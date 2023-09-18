@@ -5,16 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-// Is c an ASCII lower-case letter?
-func isASCIILower(c byte) bool {
-	return 'a' <= c && c <= 'z'
-}
-
-// Is c an ASCII digit?
-func isASCIIDigit(c byte) bool {
-	return '0' <= c && c <= '9'
-}
-
 // CamelCase was copied from https://github.com/golang/protobuf/blob/v1.5.2/protoc-gen-go/generator/generator.go#L2648
 // CamelCase returns the CamelCased name.
 // If there is an interior underscore followed by a lower case letter,
@@ -88,4 +78,14 @@ func Uncapitalize(s string) string {
 		return s
 	}
 	return string(unicode.ToLower(r)) + s[size:]
+}
+
+// Is c an ASCII lower-case letter?
+func isASCIILower(c byte) bool {
+	return 'a' <= c && c <= 'z'
+}
+
+// Is c an ASCII digit?
+func isASCIIDigit(c byte) bool {
+	return '0' <= c && c <= '9'
 }
