@@ -29,8 +29,8 @@ github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovk
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
 github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APPA=
 github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
-github.com/ogen-go/ogen v0.75.0 h1:4p9zxJOPS/lizvKfbqqzRf8jYuzr2NrMJRy69tva6uY=
-github.com/ogen-go/ogen v0.75.0/go.mod h1:Lq8KR3bzieba8gY2uJwRP9r3buXNHClbQhLNOL0PDDM=
+github.com/ogen-go/ogen v0.76.0 h1:tdYMXVi9Khui4PDU2aTMaNcWVrTCwqjhs/xYNbI5Zsw=
+github.com/ogen-go/ogen v0.76.0/go.mod h1:ZPh0dhw8iSh8NtB+V0oh082H1rzSkW7S2zhY9HYnlB4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
