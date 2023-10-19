@@ -21,6 +21,7 @@ func run() error {
 	description := set.String("description", "", "Description")
 	version := set.String("version", "", "Version")
 	indent := set.Int("indent", 2, "Indent")
+	filename := set.String("filename", "openapi", "Filename")
 
 	if err := set.Parse(os.Args[1:]); err != nil {
 		return errors.Wrap(err, "parse args")
@@ -50,7 +51,7 @@ func run() error {
 			return err
 		}
 
-		gf := plugin.NewGeneratedFile("openapi.yaml", "")
+		gf := plugin.NewGeneratedFile(fmt.Sprintf("%s.yaml", *filename), "")
 		if _, err := gf.Write(bytes); err != nil {
 			return err
 		}
