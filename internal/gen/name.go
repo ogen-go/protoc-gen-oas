@@ -62,22 +62,22 @@ func LowerCamelCase[S ~string](s S) string {
 //
 // If the string is invalid UTF-8 or empty, it is returned as is.
 func Capitalize(s string) string {
-	r, size := utf8.DecodeRuneInString(s)
-	if r == utf8.RuneError {
-		return s
-	}
-	return string(unicode.ToUpper(r)) + s[size:]
+	return firstCharConv(s, unicode.ToUpper)
 }
 
 // Uncapitalize converts first character to lower.
 //
 // If the string is invalid UTF-8 or empty, it is returned as is.
 func Uncapitalize(s string) string {
+	return firstCharConv(s, unicode.ToLower)
+}
+
+func firstCharConv(s string, converter func(r rune) rune) string {
 	r, size := utf8.DecodeRuneInString(s)
 	if r == utf8.RuneError {
 		return s
 	}
-	return string(unicode.ToLower(r)) + s[size:]
+	return string(converter(r)) + s[size:]
 }
 
 // Is c an ASCII lower-case letter?
