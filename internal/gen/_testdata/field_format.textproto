@@ -1,0 +1,57 @@
+proto_file: {
+  name: "crud.proto"
+  package: "crud.v1"
+  message_type: {
+    name: "Item"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:UUID4}
+      }
+    }
+    field: {
+      name: "name"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "name"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
+    }
+  }
+  message_type: {
+    name: "GetItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
+    }
+  }
+  service: {
+    name: "Crud"
+    method: {
+      name: "GetItem"
+      input_type: "GetItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/items/{id}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}

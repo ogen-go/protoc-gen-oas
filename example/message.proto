@@ -5,6 +5,7 @@ package service.v1;
 option go_package = "service/v1;service";
 
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 import "google/protobuf/timestamp.proto";
 
 message CreateItemRequest {
@@ -12,7 +13,10 @@ message CreateItemRequest {
 }
 
 message Item {
-  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_info).format = UUID4
+  ];
   ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
   string name = 3 [(google.api.field_behavior) = REQUIRED];
   google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED]; // Datetime when item was created.
