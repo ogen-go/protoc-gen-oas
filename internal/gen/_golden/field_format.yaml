@@ -27,8 +27,17 @@ components:
         id:
           type: string
           format: uuid
-        name:
+        ipv4:
           type: string
+          format: ipv4
+        ipv6:
+          type: string
+          format: ipv6
+        ip:
+          type: string
+          format: ip
       required:
         - id
-        - name
+        - ipv4
+        - ipv6
+        - ip
