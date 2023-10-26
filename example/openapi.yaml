@@ -175,6 +175,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           $ref: '#/components/schemas/ItemType'
         name:

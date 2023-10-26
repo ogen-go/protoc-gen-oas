@@ -1,0 +1,80 @@
+proto_file: {
+  name: "crud.proto"
+  package: "crud.v1"
+  message_type: {
+    name: "Item"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:UUID4}
+      }
+    }
+    field: {
+      name: "ipv4"
+      number: 2
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "ipv4"
+      options:{
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:IPV4}
+      }
+    }
+    field: {
+      name: "ipv6"
+      number: 3
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "ipv6"
+      options:{
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:IPV6}
+      }
+    }
+    field: {
+      name: "ip"
+      number: 4
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "ip"
+      options:{
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:IPV4_OR_IPV6}
+      }
+    }
+  }
+  message_type: {
+    name: "GetItemRequest"
+    field: {
+      name: "id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "id"
+      options:{
+        [google.api.field_behavior]:REQUIRED
+      }
+    }
+  }
+  service: {
+    name: "Crud"
+    method: {
+      name: "GetItem"
+      input_type: "GetItemRequest"
+      output_type: "Item"
+      options: {
+        [google.api.http]: {
+          get: "/api/v1/items/{id}"
+        }
+      }
+    }
+  }
+  options: {
+    go_package: "service/v1;service"
+  }
+}

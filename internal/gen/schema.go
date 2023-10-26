@@ -135,7 +135,9 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 		return ogen.NewSchema().SetType("number").SetFormat("double").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.StringKind:
-		return ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description)), nil
+		schema := ogen.NewSchema().SetType("string").SetDeprecated(isDeprecated(fd.Options())).SetDescription(mkDescription(description))
+		setFieldFormat(schema, fd.Options())
+		return schema, nil
 	case protoreflect.BytesKind:
 		// Go's protojson encodes binary data as base64 string.
 		//
@@ -274,4 +276,20 @@ func mkDescription(description string) (d string) {
 	d = strings.TrimSpace(description)
 	d = strings.TrimLeft(d, "/ ")
 	return d
+}
+
+func setFieldFormat(s *ogen.Schema, opts protoreflect.ProtoMessage) {
+	switch {
+	case isFieldUUID4Format(opts):
+		s.SetFormat("uuid")
+
+	case isFieldIPV4Format(opts):
+		s.SetFormat("ipv4")
+
+	case isFieldIPV6Format(opts):
+		s.SetFormat("ipv6")
+
+	case isFieldIPFormat(opts):
+		s.SetFormat("ip")
+	}
 }
