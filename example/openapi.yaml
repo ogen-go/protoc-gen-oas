@@ -50,6 +50,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         "200":
           description: service.v1.Service.GetItem response

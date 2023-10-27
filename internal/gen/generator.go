@@ -354,6 +354,8 @@ func (g *Generator) mkParameter(in, name string, f *protogen.Field) (*ogen.Param
 		return nil, errors.Wrapf(err, "generate %s parameter %q", in, f.Desc.Name())
 	}
 
+	setFieldFormat(s, f.Desc.Options())
+
 	p := ogen.NewParameter().
 		SetIn(in).
 		SetName(name).
