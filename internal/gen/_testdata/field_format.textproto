@@ -57,7 +57,8 @@ proto_file: {
       type: TYPE_STRING
       json_name: "id"
       options:{
-        [google.api.field_behavior]:REQUIRED
+        [google.api.field_behavior]:REQUIRED,
+        [google.api.field_info]:{format:UUID4}
       }
     }
   }

@@ -12,6 +12,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         "200":
           description: crud.v1.Crud.GetItem response
