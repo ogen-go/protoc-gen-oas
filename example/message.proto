@@ -41,7 +41,10 @@ message GetItemsResponse {
 }
 
 message GetItemRequest {
-  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_info).format = UUID4
+  ];
 }
 
 message UpdateItemRequest {

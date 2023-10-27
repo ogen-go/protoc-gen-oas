@@ -18,6 +18,7 @@ protoc --oas_out=. service.proto
 
 - support [API annotations](https://github.com/googleapis/googleapis/blob/master/google/api/annotations.proto) in methods
 - support [field behavior](https://github.com/googleapis/googleapis/blob/master/google/api/field_behavior.proto) in message field description
+- support [field info](https://github.com/googleapis/googleapis/blob/master/google/api/field_info.proto) in message field description
 
 # Generate OpenAPI
 
@@ -373,4 +374,69 @@ components:
   schemas:
     Empty:
       type: object
+```
+
+## Set field format
+
+```protobuf title="service.proto"
+syntax = "proto3";
+
+package service.v1;
+
+option go_package = "service/v1;service";
+
+import "google/api/annotations.proto";
+import "google/api/field_info.proto";
+
+service Service {
+  rpc GetItem(GetItemRequest) returns (Item) {
+    option (google.api.http) = {
+      get: "/api/v1/items/{id}"
+    };
+  }
+}
+
+message GetItemRequest {
+  string id = 1 [(google.api.field_info).format = UUID4]; // <--
+}
+
+message Item {
+  string id = 1 [(google.api.field_info).format = UUID4]; // <--
+  string name = 2;
+}
+```
+
+```yaml title="openapi.yaml"
+openapi: 3.1.0
+info:
+  title: ""
+  version: ""
+paths:
+  /api/v1/items/{id}:
+    get:
+      operationId: getItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid # <--
+      responses:
+        "200":
+          description: service.v1.Service.GetItem response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid # <--
+        name:
+          type: string
 ```
