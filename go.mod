@@ -3,7 +3,7 @@ module github.com/ogen-go/protoc-gen-oas
 go 1.21
 
 require (
-	github.com/go-faster/errors v0.6.1
+	github.com/go-faster/errors v0.7.0
 	github.com/go-faster/sdk v0.9.2
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v0.77.0
