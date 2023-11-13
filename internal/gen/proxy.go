@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"slices"
 	"strings"
 	"sync"
 
 	"github.com/go-faster/errors"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 	goimports "golang.org/x/tools/imports"
 	"google.golang.org/protobuf/compiler/protogen"
 

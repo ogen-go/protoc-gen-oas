@@ -2,6 +2,7 @@ package gen
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -256,7 +257,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			values := maps.Values(fields)
 			// Sort to make output stable.
 			slices.SortStableFunc(values, func(a, b *protogen.Field) int {
-				return strings.Compare(string(a.Desc.FullName()), string(b.Desc.FullName()))
+				return cmp.Compare(string(a.Desc.FullName()), string(b.Desc.FullName()))
 			})
 			if err := g.mkJSONFields(s, values); err != nil {
 				return "", errors.Wrap(err, "make requestBody schema")
@@ -296,9 +297,9 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	// Sort to make output stable.
 	slices.SortStableFunc(op.Parameters, func(a, b *ogen.Parameter) int {
 		if a.In != b.In {
-			return strings.Compare(a.In, b.In)
+			return cmp.Compare(a.In, b.In)
 		}
-		return strings.Compare(a.Name, b.Name)
+		return cmp.Compare(a.Name, b.Name)
 	})
 
 	return tmpl.String(), nil
