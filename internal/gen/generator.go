@@ -107,6 +107,8 @@ type Generator struct {
 	spec   *ogen.Spec
 	indent int
 
+	pkgName string
+
 	messages map[string]*protogen.Message
 	enums    map[string]*protogen.Enum
 	ops      map[string]*methodSet
@@ -134,6 +136,8 @@ func (g *Generator) JSON() ([]byte, error) {
 func (g *Generator) init() {
 	g.spec = ogen.NewSpec()
 	g.spec.Init()
+
+	g.pkgName = "oas"
 
 	g.messages = map[string]*protogen.Message{}
 	g.enums = map[string]*protogen.Enum{}

@@ -13,6 +13,7 @@ import (
 	"github.com/ogen-go/ogen/gen/ir"
 )
 
+// FieldElem carries mapped field information.
 type FieldElem struct {
 	Ogen     *ir.Type
 	Proto    *protogen.Field
