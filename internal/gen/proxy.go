@@ -77,7 +77,7 @@ func (g *Generator) WriteProxy(plugin *protogen.Plugin) error {
 		return errors.Wrap(err, "write ogen files")
 	}
 	imports[oasPath] = packageImport{
-		Name: "oas",
+		Name: protogen.GoPackageName(g.pkgName),
 		Path: oasPath,
 	}
 
@@ -121,12 +121,12 @@ func (g *Generator) WriteProxy(plugin *protogen.Plugin) error {
 }
 
 func (g *Generator) mapSpec(og *gen.Generator) (mapping Mapping, _ error) {
-	refName := func(ref jsonschema.Ref) string {
+	refName := func(ref jsonschema.Ref) (string, error) {
 		idx := strings.LastIndexByte(ref.Ptr, '/')
 		if idx < 0 {
-			panic(fmt.Sprintf("unexpected ref: %q", ref))
+			return "", errors.Errorf("unexpected ref: %q", ref)
 		}
-		return ref.Ptr[idx+1:]
+		return ref.Ptr[idx+1:], nil
 	}
 
 	for _, typ := range og.Types() {
@@ -135,7 +135,10 @@ func (g *Generator) mapSpec(og *gen.Generator) (mapping Mapping, _ error) {
 			continue
 		}
 
-		name := refName(s.Ref)
+		name, err := refName(s.Ref)
+		if err != nil {
+			return mapping, errors.Wrapf(err, "map type %q", typ.Name)
+		}
 		if m, ok := g.messages[name]; ok {
 			mapping.Messages = append(mapping.Messages, g.mapMessage(typ, m))
 			continue
@@ -148,19 +151,24 @@ func (g *Generator) mapSpec(og *gen.Generator) (mapping Mapping, _ error) {
 
 	services := map[*protogen.Service][]MethodMapping{}
 	for _, op := range og.Operations() {
-		tmpl := op.Spec.Path.String()
-		ms, ok := g.ops[tmpl]
-		if !ok {
-			panic(fmt.Sprintf("unknown path %q", tmpl))
-		}
+		if err := func() error {
+			tmpl := op.Spec.Path.String()
+			ms, ok := g.ops[tmpl]
+			if !ok {
+				return errors.Errorf("unknown path %q", tmpl)
+			}
 
-		httpMethod := strings.ToUpper(op.Spec.HTTPMethod)
-		rule, ok := ms.Methods[httpMethod]
-		if !ok {
-			panic(fmt.Sprintf("can't find gRPC method for %s %s", httpMethod, op.Spec.Path))
-		}
+			httpMethod := strings.ToUpper(op.Spec.HTTPMethod)
+			rule, ok := ms.Methods[httpMethod]
+			if !ok {
+				return errors.Errorf("can't find gRPC method for %s %s", httpMethod, op.Spec.Path)
+			}
 
-		services[rule.Service] = append(services[rule.Service], g.mapMethod(op, rule))
+			services[rule.Service] = append(services[rule.Service], g.mapMethod(op, rule))
+			return nil
+		}(); err != nil {
+			return mapping, errors.Wrapf(err, "map operation %s", op.PrettyOperationID())
+		}
 	}
 
 	for s, m := range services {
@@ -206,7 +214,7 @@ func (g *Generator) mapMethod(ogenOp *ir.Operation, mr methodRule) MethodMapping
 	input := g.mapInput(mr.Rule.Body, ogenOp, mr.Method.Input)
 	output := OutputMapping{
 		ProtoType: mr.Method.Output.GoIdent.GoName,
-		OgenType:  qualifiedOgenType("oas", ogenOp.Responses.GoType()),
+		OgenType:  qualifiedOgenType(g.pkgName, ogenOp.Responses.GoType()),
 		Ogen:      ogenOp.Responses.Type,
 		Proto:     mr.Method.Output,
 	}
@@ -217,7 +225,7 @@ func (g *Generator) mapMethod(ogenOp *ir.Operation, mr methodRule) MethodMapping
 		ProtoName:   mr.Method.GoName,
 		OgenName:    ogenOp.Name,
 		OperationID: ogenOp.Spec.OperationID,
-		ParamsType:  qualifiedOgenType("oas", ogenOp.Name+"Params"),
+		ParamsType:  qualifiedOgenType(g.pkgName, ogenOp.Name+"Params"),
 		Input:       input,
 		Output:      output,
 	}
@@ -250,7 +258,7 @@ func (g *Generator) mapInput(bodySel string, ogenOp *ir.Operation, msg *protogen
 
 	if req := ogenOp.Request; req != nil {
 		body := &BodyMapping{
-			OgenType: qualifiedOgenType("oas", req.GoType()),
+			OgenType: qualifiedOgenType(g.pkgName, req.GoType()),
 			Proto:    msg,
 			Ogen:     req,
 		}
@@ -277,7 +285,7 @@ func (g *Generator) mapSelector(sel string, ogenType *ir.Type, protoType *protog
 func (g *Generator) mapMessage(ogenType *ir.Type, protoType *protogen.Message) MessageMapping {
 	m := MessageMapping{
 		ProtoType: protoType.GoIdent.GoName,
-		OgenType:  qualifiedOgenType("oas", ogenType.Go()),
+		OgenType:  qualifiedOgenType(g.pkgName, ogenType.Go()),
 	}
 
 	ogenFields := make(map[string]*ir.Field, len(ogenType.Fields))
@@ -310,7 +318,7 @@ func (g *Generator) mapEnum(o *ir.Type, p *protogen.Enum) EnumMapping {
 	protoType := p.GoIdent.GoName
 	return EnumMapping{
 		ProtoType:    protoType,
-		OgenType:     qualifiedOgenType("oas", o.Go()),
+		OgenType:     qualifiedOgenType(g.pkgName, o.Go()),
 		EnumNameMap:  protoType + "_name",
 		EnumValueMap: protoType + "_value",
 	}

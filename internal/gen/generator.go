@@ -130,6 +130,8 @@ type Generator struct {
 	requests        map[string]struct{}
 	descriptorNames map[string]struct{}
 
+	pkgName string
+
 	messages map[string]*protogen.Message
 	enums    map[string]*protogen.Enum
 	ops      map[string]*methodSet
@@ -160,6 +162,7 @@ func (g *Generator) init() {
 
 	g.requests = make(map[string]struct{})
 	g.descriptorNames = make(map[string]struct{})
+	g.pkgName = "oas"
 
 	g.messages = map[string]*protogen.Message{}
 	g.enums = map[string]*protogen.Enum{}
