@@ -35,8 +35,8 @@ func collectRules(opts protoreflect.ProtoMessage) (rules []HTTPRule) {
 			return
 		}
 		rules = append(rules, HTTPRule{
-			Method:     method(rule),
-			Path:       path(rule),
+			Method:     ruleMethod(rule),
+			Path:       rulePath(rule),
 			Body:       rule.Body,
 			Additional: additional,
 		})
@@ -49,7 +49,7 @@ func collectRules(opts protoreflect.ProtoMessage) (rules []HTTPRule) {
 	return rules
 }
 
-func method(httpRule *annotations.HttpRule) string {
+func ruleMethod(httpRule *annotations.HttpRule) string {
 	switch httpRule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		return http.MethodGet
@@ -71,7 +71,7 @@ func method(httpRule *annotations.HttpRule) string {
 	}
 }
 
-func path(httpRule *annotations.HttpRule) string {
+func rulePath(httpRule *annotations.HttpRule) string {
 	switch pattern := httpRule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		return pattern.Get

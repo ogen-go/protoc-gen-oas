@@ -1,0 +1,72 @@
+{{- /*gotype: github.com/ogen-go/protoc-gen-oas/internal/gen.TemplateConfig*/ -}}
+{{ define "handler" }}
+{{- template "header" $ }}
+
+// WrapperHandler is an oas.Handler implementation that maps request to gRPC server.
+type WrapperHandler struct {
+{{- range $s := $.Services }}
+  {{ $s.ProtoName }} {{ $s.ProtoServer }}
+{{- end }}
+}
+
+var _ oas.Handler = (*WrapperHandler)(nil)
+
+{{- range $s := $.Services }}{{- range $m := $s.Methods }}
+// {{ $m.OgenName }} maps request to {{ $s.ProtoName }}.{{ $m.ProtoName }}.
+func (h *WrapperHandler) {{ $m.OgenName }}(ctx context.Context,
+    {{- if $m.Input.HasParams }}params {{ $m.ParamsType }},{{- end -}}
+    {{- if $m.Input.Body }}req {{ $m.Input.Body.OgenType }},{{- end -}}
+)(resp {{ $m.Output.OgenType }}, _ error) {
+    input := new({{ $m.Input.ProtoType }})
+    {{- if $m.Input.HasParams }}
+    h.map{{ $m.OgenName }}Params(input, params)
+    {{- end }}
+    {{- if $m.Input.Body }}
+    h.map{{ $m.OgenName }}BodyInput(input, req)
+    {{- end }}
+    output, err := h.{{ $s.ProtoName }}.{{ $m.ProtoName }}(ctx, input)
+    if err != nil {
+      return resp, err
+    }
+    return h.map{{ $m.OgenName }}Output(output), nil
+}
+
+{{ if $m.Input.HasParams -}}
+func (h *WrapperHandler) map{{ $m.OgenName }}Params(pm *{{ $m.Input.ProtoType }}, om {{ $m.ParamsType }}) {
+    {{- range $p :=  $m.Input.Path }}
+     {{- template "map_value_from" $p.Elem }}
+    {{- end }}
+}
+{{- end }}
+
+{{ with $body := $m.Input.Body -}}
+func (h *WrapperHandler) map{{ $m.OgenName }}BodyInput(pm *{{ $m.Input.ProtoType }}, om {{ $body.OgenType }}) {
+{{- if $m.Input.AllInBody }}
+  {{- if $body.PassByPointer }}
+      pm.FromOpenAPI(*om)
+  {{- else }}
+      pm.FromOpenAPI(om)
+  {{- end }}
+{{- else if $body.Field -}}
+   {{- template "map_value_from" $body.Field.Elem }}
+{{- end }}
+}
+{{- end }}
+
+func (h *WrapperHandler) map{{ $m.OgenName }}Output(pm *{{ $m.Output.ProtoType }}) (om {{ $m.Output.OgenType }}) {
+{{- if $m.Output.AllInBody }}
+  respVal := pm.ToOpenAPI()
+  {{- if $m.Output.PassByPointer }}
+    return &respVal
+  {{- else }}
+    return respVal
+  {{- end }}
+{{- else }}
+    {{ template "map_value_to" $m.Output.Field.Elem }}
+    return resp
+{{- end }}
+}
+
+{{ end }}{{- end }}
+
+{{- end }}

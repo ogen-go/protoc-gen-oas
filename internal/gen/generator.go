@@ -2,6 +2,7 @@ package gen
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -51,6 +52,19 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 						g.spec.AddPathItem(tmpl, pi)
 					}
 
+					ms, ok := g.ops[tmpl]
+					if !ok {
+						ms = &methodSet{
+							Methods: map[string]methodRule{},
+						}
+						g.ops[tmpl] = ms
+					}
+					ms.Methods[rule.Method] = methodRule{
+						Rule:    rule,
+						Method:  m,
+						Service: s,
+					}
+
 					var to **ogen.Operation
 					switch rule.Method {
 					case http.MethodGet:
@@ -77,10 +91,28 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 	return g, nil
 }
 
+type methodSet struct {
+	Template pathTemplate
+	// HTTP Method -> RPC Method.
+	Methods map[string]methodRule
+}
+
+type methodRule struct {
+	Rule    HTTPRule
+	Method  *protogen.Method
+	Service *protogen.Service
+}
+
 // Generator instance.
 type Generator struct {
 	spec   *ogen.Spec
 	indent int
+
+	pkgName string
+
+	messages map[string]*protogen.Message
+	enums    map[string]*protogen.Enum
+	ops      map[string]*methodSet
 }
 
 // YAML returns OpenAPI specification bytes.
@@ -105,6 +137,12 @@ func (g *Generator) JSON() ([]byte, error) {
 func (g *Generator) init() {
 	g.spec = ogen.NewSpec()
 	g.spec.Init()
+
+	g.pkgName = "oas"
+
+	g.messages = map[string]*protogen.Message{}
+	g.enums = map[string]*protogen.Enum{}
+	g.ops = map[string]*methodSet{}
 }
 
 func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (string, *ogen.Operation, error) {
@@ -190,7 +228,7 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			values := maps.Values(fields)
 			// Sort to make output stable.
 			slices.SortStableFunc(values, func(a, b *protogen.Field) int {
-				return strings.Compare(string(a.Desc.FullName()), string(b.Desc.FullName()))
+				return cmp.Compare(string(a.Desc.FullName()), string(b.Desc.FullName()))
 			})
 			if err := g.mkJSONFields(s, values); err != nil {
 				return "", errors.Wrap(err, "make requestBody schema")
@@ -230,9 +268,9 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 	// Sort to make output stable.
 	slices.SortStableFunc(op.Parameters, func(a, b *ogen.Parameter) int {
 		if a.In != b.In {
-			return strings.Compare(a.In, b.In)
+			return cmp.Compare(a.In, b.In)
 		}
-		return strings.Compare(a.Name, b.Name)
+		return cmp.Compare(a.Name, b.Name)
 	})
 
 	return tmpl.String(), nil

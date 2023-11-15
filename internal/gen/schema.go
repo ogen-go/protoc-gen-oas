@@ -3,6 +3,7 @@ package gen
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -22,6 +23,7 @@ func (g *Generator) mkEnum(e *protogen.Enum) error {
 
 	name := descriptorName(e.Desc)
 	g.spec.AddSchema(name, s)
+	g.enums[name] = e
 	return nil
 }
 
@@ -34,7 +36,8 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	enum := make([]json.RawMessage, 0, values.Len())
 
 	for i := 0; i < values.Len(); i++ {
-		val := []byte(values.Get(i).Name())
+		name := values.Get(i).Name()
+		val := strconv.AppendQuote(nil, string(name))
 		enum = append(enum, val)
 	}
 
@@ -71,6 +74,7 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 
 	name := descriptorName(msg.Desc)
 	g.spec.AddSchema(name, s)
+	g.messages[name] = msg
 	return nil
 }
 
