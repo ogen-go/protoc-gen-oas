@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
 import "google/protobuf/timestamp.proto";
+
+option go_package = "service/v1;service";
 
 message CreateItemRequest {
   string name = 1 [(google.api.field_behavior) = REQUIRED];
