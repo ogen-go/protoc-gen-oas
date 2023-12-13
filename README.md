@@ -29,9 +29,9 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc GetItem(GetItemRequest) returns (Item) {
@@ -91,9 +91,9 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
@@ -174,10 +174,10 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
@@ -244,9 +244,9 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
@@ -329,10 +329,10 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
@@ -383,10 +383,10 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
 import "google/api/field_info.proto";
+
+option go_package = "service/v1;service";
 
 service Service {
   rpc GetItem(GetItemRequest) returns (Item) {

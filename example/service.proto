@@ -2,45 +2,45 @@ syntax = "proto3";
 
 package service.v1;
 
-option go_package = "service/v1;service";
-
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "message.proto";
 
+option go_package = "service/v1;service";
+
 service Service {
-    rpc CreateItem(CreateItemRequest) returns (Item) {
-        option (google.api.http) = {
-            post: "/api/v1/items"
-            body: "*"
-        };
-    }
-    rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/items"
-        };
-    }
-    rpc GetItem(GetItemRequest) returns (Item) {
-        option (google.api.http) = {
-            get: "/api/v1/items/{id}"
-        };
-    }
-    rpc UpdateItem(UpdateItemRequest) returns (Item) {
-        option (google.api.http) = {
-            put: "/api/v1/items/{id}"
-            body: "*"
-        };
-    }
-    rpc PatchItem(PatchItemRequest) returns (Item) {
-        option (google.api.http) = {
-            patch: "/api/v1/items/{id}"
-            body: "*"
-        };
-    }
-    rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/api/v1/items/{id}"
-            body: "*"
-        };
-    }
+  rpc CreateItem(CreateItemRequest) returns (Item) {
+    option (google.api.http) = {
+      post: "/api/v1/items"
+      body: "*"
+    };
+  }
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/items"
+    };
+  }
+  rpc GetItem(GetItemRequest) returns (Item) {
+    option (google.api.http) = {
+      get: "/api/v1/items/{id}"
+    };
+  }
+  rpc UpdateItem(UpdateItemRequest) returns (Item) {
+    option (google.api.http) = {
+      put: "/api/v1/items/{id}"
+      body: "*"
+    };
+  }
+  rpc PatchItem(PatchItemRequest) returns (Item) {
+    option (google.api.http) = {
+      patch: "/api/v1/items/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteItem(DeleteItemRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/items/{id}"
+      body: "*"
+    };
+  }
 }
