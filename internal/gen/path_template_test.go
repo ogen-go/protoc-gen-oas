@@ -85,7 +85,7 @@ func FuzzParsePathTemplate(f *testing.F) {
 	} {
 		f.Add(s)
 	}
-	f.Fuzz(func(t *testing.T, tmpl string) {
+	f.Fuzz(func(_ *testing.T, tmpl string) {
 		_, _ = parsePathTemplate(tmpl)
 	})
 }
