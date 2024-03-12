@@ -1,12 +1,14 @@
 module github.com/ogen-go/protoc-gen-oas
 
-go 1.21
+go 1.21.0
+
+toolchain go1.22.1
 
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/sdk v0.13.0
 	github.com/go-faster/yaml v0.4.6
-	github.com/ogen-go/ogen v0.82.0
+	github.com/ogen-go/ogen v0.83.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	google.golang.org/genproto/googleapis/api v0.0.0-20231016165738-49dd2c1f3d0b
@@ -15,7 +17,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/jx v1.1.0 // indirect
@@ -26,9 +28,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20231016165738-49dd2c1f3d0b // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
