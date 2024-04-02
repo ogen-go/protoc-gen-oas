@@ -151,6 +151,8 @@ components:
           format: int32
         nestedItem:
           $ref: '#/components/schemas/GetItemsResponse.NestedItem'
+        nestedType:
+          $ref: '#/components/schemas/NestedEnum.ItemType'
       required:
         - items
         - totalCount
@@ -191,6 +193,11 @@ components:
         - name
         - createdAt
     ItemType:
+      type: string
+      enum:
+        - ITEM_TYPE_UNSPECIFIED
+        - ITEM_TYPE_BASIC
+    NestedEnum.ItemType:
       type: string
       enum:
         - ITEM_TYPE_UNSPECIFIED

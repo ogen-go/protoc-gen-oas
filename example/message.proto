@@ -38,6 +38,7 @@ message GetItemsResponse {
   repeated Item items = 1 [(google.api.field_behavior) = REQUIRED];
   int32 total_count = 2 [(google.api.field_behavior) = REQUIRED];
   NestedItem nested_item = 3;
+  NestedEnum.ItemType nested_type = 4;
 }
 
 message GetItemRequest {
@@ -66,4 +67,11 @@ message DeleteItemRequest {
 enum ItemType {
   ITEM_TYPE_UNSPECIFIED = 0;
   ITEM_TYPE_BASIC = 1;
+}
+
+message NestedEnum {
+  enum ItemType {
+    ITEM_TYPE_UNSPECIFIED = 0;
+    ITEM_TYPE_BASIC = 1;
+  }
 }
