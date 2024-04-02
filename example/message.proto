@@ -25,6 +25,7 @@ message Item {
 message GetItemsRequest {
   int32 limit = 1 [(google.api.field_behavior) = REQUIRED];
   int32 offset = 2 [(google.api.field_behavior) = REQUIRED];
+  NestedEnum.ItemType nested_type = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetItemsResponse {
