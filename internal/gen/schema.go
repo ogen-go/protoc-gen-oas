@@ -49,11 +49,19 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 	}
 
 	for _, field := range msg.Fields {
-		if field.Desc.HasPresence() || !field.Desc.HasPresence() && field.Message == nil {
+		if field.Desc.HasPresence() {
 			continue
 		}
-		if err := g.mkSchema(field.Message); err != nil {
-			return err
+
+		if field.Message != nil {
+			if err := g.mkSchema(field.Message); err != nil {
+				return err
+			}
+		}
+		if field.Enum != nil {
+			if err := g.mkEnum(field.Enum); err != nil {
+				return err
+			}
 		}
 	}
 
