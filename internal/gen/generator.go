@@ -324,9 +324,9 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 					continue
 				}
 			case protoreflect.EnumKind:
-				name := descriptorName(fd.Enum())
+				descName := descriptorName(fd.Enum())
 				s := mkEnumOgenSchema(fd.Enum())
-				g.spec.AddSchema(name, s)
+				g.spec.AddSchema(descName, s)
 			case protoreflect.GroupKind:
 				return errors.Errorf("unsupported kind: %s", kind)
 			}
