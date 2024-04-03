@@ -14,15 +14,11 @@ import (
 	"github.com/ogen-go/ogen"
 )
 
-func (g *Generator) mkEnum(e *protogen.Enum) error {
-	s := &ogen.Schema{
-		Type: "string",
-		Enum: enum(e.Desc),
-	}
+func (g *Generator) mkEnum(e *protogen.Enum) {
+	s := mkEnumOgenSchema(e.Desc)
 
 	name := descriptorName(e.Desc)
 	g.spec.AddSchema(name, s)
-	return nil
 }
 
 func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
@@ -39,6 +35,15 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	}
 
 	return enum
+}
+
+func mkEnumOgenSchema(ed protoreflect.EnumDescriptor) *ogen.Schema {
+	s := &ogen.Schema{
+		Type: "string",
+		Enum: enum(ed),
+	}
+
+	return s
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
@@ -59,9 +64,7 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 			}
 		}
 		if field.Enum != nil {
-			if err := g.mkEnum(field.Enum); err != nil {
-				return err
-			}
+			g.mkEnum(field.Enum)
 		}
 	}
 
@@ -72,9 +75,7 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 	}
 
 	for _, e := range msg.Enums {
-		if err := g.mkEnum(e); err != nil {
-			return err
-		}
+		g.mkEnum(e)
 	}
 
 	name := descriptorName(msg.Desc)

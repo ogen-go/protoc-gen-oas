@@ -13,6 +13,11 @@ paths:
           schema:
             type: integer
             format: int32
+        - name: nestedType
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/NestedEnum.ItemType'
         - name: offset
           in: query
           required: true

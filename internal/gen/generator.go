@@ -32,9 +32,7 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 		}
 
 		for _, e := range f.Enums {
-			if err := g.mkEnum(e); err != nil {
-				return nil, err
-			}
+			g.mkEnum(e)
 		}
 
 		for _, s := range f.Services {
@@ -346,6 +344,10 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 					delete(seen, msg)
 					continue
 				}
+			case protoreflect.EnumKind:
+				descName := descriptorName(fd.Enum())
+				s := mkEnumOgenSchema(fd.Enum())
+				g.spec.AddSchema(descName, s)
 			case protoreflect.GroupKind:
 				return errors.Errorf("unsupported kind: %s", kind)
 			}
