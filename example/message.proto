@@ -34,6 +34,7 @@ message GetItemsResponse {
     ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
     string name = 3 [(google.api.field_behavior) = REQUIRED];
     google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED];
+    repeated NestedItem nested_item = 5;
   }
 
   repeated Item items = 1 [(google.api.field_behavior) = REQUIRED];

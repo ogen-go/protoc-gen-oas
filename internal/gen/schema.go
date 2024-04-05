@@ -59,6 +59,15 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 		}
 
 		if field.Message != nil {
+			currentDescriptorName := descriptorName(field.Desc)
+			if g.lastDescriptorName == currentDescriptorName {
+				s.SetRef(descriptorRef(field.Message.Desc))
+
+				continue
+			}
+
+			g.lastDescriptorName = currentDescriptorName
+
 			if err := g.mkSchema(field.Message); err != nil {
 				return err
 			}

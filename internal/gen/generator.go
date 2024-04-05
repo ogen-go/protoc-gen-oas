@@ -70,6 +70,12 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 				}
 			}
 		}
+	}
+
+	for _, f := range files {
+		if !f.Generate {
+			continue
+		}
 
 		for _, m := range f.Messages {
 			name := descriptorName(m.Desc)
@@ -93,9 +99,10 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 // Generator instance.
 type Generator struct {
-	spec     *ogen.Spec
-	indent   int
-	requests map[string]struct{}
+	spec               *ogen.Spec
+	indent             int
+	requests           map[string]struct{}
+	lastDescriptorName string
 }
 
 // YAML returns OpenAPI specification bytes.
