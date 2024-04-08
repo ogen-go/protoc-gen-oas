@@ -173,6 +173,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        nestedItem:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetItemsResponse.NestedItem'
       required:
         - id
         - type
@@ -202,6 +206,8 @@ components:
       enum:
         - ITEM_TYPE_UNSPECIFIED
         - ITEM_TYPE_BASIC
+    NestedEnum:
+      type: object
     NestedEnum.ItemType:
       type: string
       enum:

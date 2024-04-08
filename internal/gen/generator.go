@@ -70,6 +70,12 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 				}
 			}
 		}
+	}
+
+	for _, f := range files {
+		if !f.Generate {
+			continue
+		}
 
 		for _, m := range f.Messages {
 			name := descriptorName(m.Desc)
@@ -93,9 +99,10 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 // Generator instance.
 type Generator struct {
-	spec     *ogen.Spec
-	indent   int
-	requests map[string]struct{}
+	spec            *ogen.Spec
+	indent          int
+	requests        map[string]struct{}
+	descriptorNames map[string]struct{}
 }
 
 // YAML returns OpenAPI specification bytes.
@@ -121,6 +128,7 @@ func (g *Generator) init() {
 	g.spec = ogen.NewSpec()
 	g.spec.Init()
 	g.requests = make(map[string]struct{})
+	g.descriptorNames = make(map[string]struct{})
 }
 
 func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (string, *ogen.Operation, error) {
@@ -143,7 +151,7 @@ func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (string, *ogen.O
 
 func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operation) (string, error) {
 	name := descriptorName(m.Input.Desc)
-	g.requests[name] = struct{}{}
+	g.setRequest(name)
 
 	var (
 		fields        = collectFields(m.Input)
@@ -403,8 +411,29 @@ func (g *Generator) hasSchema(s string) bool {
 	return ok
 }
 
-func (g *Generator) hasRequest(r string) bool {
-	_, ok := g.requests[r]
+func (g *Generator) setRequest(s string) {
+	if g.hasRequest(s) {
+		return
+	}
+
+	g.requests[s] = struct{}{}
+}
+
+func (g *Generator) hasRequest(s string) bool {
+	_, ok := g.requests[s]
+	return ok
+}
+
+func (g *Generator) setDescriptorName(s string) {
+	if g.hasDescriptorName(s) {
+		return
+	}
+
+	g.descriptorNames[s] = struct{}{}
+}
+
+func (g *Generator) hasDescriptorName(s string) bool {
+	_, ok := g.descriptorNames[s]
 	return ok
 }
 
