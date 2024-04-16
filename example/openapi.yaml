@@ -63,6 +63,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
+      deprecated: true
     put:
       operationId: updateItem
       parameters:

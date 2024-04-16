@@ -24,6 +24,7 @@ service Service {
     option (google.api.http) = {
       get: "/api/v1/items/{id}"
     };
+    option deprecated = true;
   }
   rpc UpdateItem(UpdateItemRequest) returns (Item) {
     option (google.api.http) = {
