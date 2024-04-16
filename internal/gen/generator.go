@@ -37,8 +37,10 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
+
 				for _, rule := range collectRules(m.Desc.Options()) {
-					tmpl, op, err := g.mkMethod(rule, m)
+					isDeprecated := isDeprecatedMethod(m.Desc.Options())
+					tmpl, op, err := g.mkMethod(rule, m, isDeprecated)
 					if err != nil {
 						return nil, errors.Wrapf(err, "make method %s => %s %s mapping", m.Desc.FullName(), rule.Method, rule.Path)
 					}
@@ -131,11 +133,12 @@ func (g *Generator) init() {
 	g.descriptorNames = make(map[string]struct{})
 }
 
-func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method) (string, *ogen.Operation, error) {
+func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method, depre bool) (string, *ogen.Operation, error) {
 	op := ogen.NewOperation()
 	if !rule.Additional {
 		op.SetOperationID(LowerCamelCase(m.Desc.Name()))
 	}
+	op.Deprecated = depre
 
 	tmpl, err := g.mkInput(rule, m, op)
 	if err != nil {
