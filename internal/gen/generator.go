@@ -37,7 +37,6 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 
 		for _, s := range f.Services {
 			for _, m := range s.Methods {
-
 				for _, rule := range collectRules(m.Desc.Options()) {
 					isDeprecated := isDeprecatedMethod(m.Desc.Options())
 					tmpl, op, err := g.mkMethod(rule, m, isDeprecated)
