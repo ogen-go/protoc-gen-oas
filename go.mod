@@ -6,7 +6,7 @@ toolchain go1.22.1
 
 require (
 	github.com/go-faster/errors v0.7.1
-	github.com/go-faster/sdk v0.13.0
+	github.com/go-faster/sdk v0.14.0
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v1.1.0
 	github.com/stretchr/testify v1.9.0
