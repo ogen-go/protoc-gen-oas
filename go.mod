@@ -1,13 +1,12 @@
 module github.com/ogen-go/protoc-gen-oas
 
-go 1.21.0
-toolchain go1.22.5
+go 1.22.0
 
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/sdk v0.15.1
 	github.com/go-faster/yaml v0.4.6
-	github.com/ogen-go/ogen v1.5.0
+	github.com/ogen-go/ogen v1.6.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda
@@ -17,7 +16,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
-	github.com/fatih/color v1.17.0 // indirect
+	github.com/fatih/color v1.18.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/jx v1.1.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
