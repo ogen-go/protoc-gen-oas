@@ -12,7 +12,7 @@ import (
 )
 
 func encodeEchoResponse(response *StringMessage, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
 
@@ -26,7 +26,7 @@ func encodeEchoResponse(response *StringMessage, w http.ResponseWriter, span tra
 }
 
 func encodePathParamResponse(response *StringMessage, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
 
@@ -40,7 +40,7 @@ func encodePathParamResponse(response *StringMessage, w http.ResponseWriter, spa
 }
 
 func encodeTestModelEndpointResponse(response *TestModel, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
 

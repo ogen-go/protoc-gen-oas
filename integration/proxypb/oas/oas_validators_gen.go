@@ -24,6 +24,10 @@ func (s TestEnum) Validate() error {
 }
 
 func (s *TestModel) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
 	var failures []validate.FieldError
 	if err := func() error {
 		if value, ok := s.OptionalFloat.Get(); ok {

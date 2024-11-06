@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.19.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ogen-go/ogen/conv"
@@ -96,7 +96,7 @@ func (c *Client) Echo(ctx context.Context, request OptString) (*StringMessage, e
 func (c *Client) sendEcho(ctx context.Context, request OptString) (res *StringMessage, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("echo"),
-		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/echo"),
 	}
 
@@ -169,7 +169,7 @@ func (c *Client) PathParam(ctx context.Context, params PathParamParams) (*String
 func (c *Client) sendPathParam(ctx context.Context, params PathParamParams) (res *StringMessage, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("pathParam"),
-		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/pathParam/{value}"),
 	}
 
@@ -257,17 +257,8 @@ func (c *Client) TestModelEndpoint(ctx context.Context, request *TestModel) (*Te
 func (c *Client) sendTestModelEndpoint(ctx context.Context, request *TestModel) (res *TestModel, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("testModelEndpoint"),
-		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/testModel"),
-	}
-	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
 	}
 
 	// Run stopwatch.

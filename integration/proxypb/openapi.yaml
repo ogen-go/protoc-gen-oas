@@ -59,6 +59,23 @@ components:
           type: boolean
         childStr1:
           type: string
+    ChildModel3:
+      type: object
+      properties:
+        subKey:
+          type: string
+        bool1:
+          type: boolean
+        i32:
+          type: integer
+          format: int32
+        optStr:
+          type: string
+        optBool:
+          type: boolean
+        optI32:
+          type: integer
+          format: int32
     StringMessage:
       type: object
       properties:
