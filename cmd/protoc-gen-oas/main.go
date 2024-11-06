@@ -22,6 +22,7 @@ func run() error {
 	version := set.String("version", "", "Version")
 	indent := set.Int("indent", 2, "Indent")
 	filename := set.String("filename", "openapi", "Filename")
+	proxy := set.Bool("proxy", false, "Generate generate gRPC proxy based on ogen")
 
 	if err := set.Parse(os.Args[1:]); err != nil {
 		return errors.Wrap(err, "parse args")
@@ -54,6 +55,12 @@ func run() error {
 		gf := plugin.NewGeneratedFile(fmt.Sprintf("%s.yaml", *filename), "")
 		if _, err := gf.Write(bytes); err != nil {
 			return err
+		}
+
+		if *proxy {
+			if err := g.WriteProxy(plugin); err != nil {
+				return errors.Wrap(err, "write proxy")
+			}
 		}
 
 		return nil

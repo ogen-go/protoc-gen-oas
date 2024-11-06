@@ -3,6 +3,7 @@ package gen
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -19,6 +20,8 @@ func (g *Generator) mkEnum(e *protogen.Enum) {
 
 	name := descriptorName(e.Desc)
 	g.spec.AddSchema(name, s)
+
+	g.enums[name] = e
 }
 
 func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
@@ -30,7 +33,8 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 	enum := make([]json.RawMessage, 0, values.Len())
 
 	for i := 0; i < values.Len(); i++ {
-		val := []byte(values.Get(i).Name())
+		name := values.Get(i).Name()
+		val := strconv.AppendQuote(nil, string(name))
 		enum = append(enum, val)
 	}
 
@@ -47,7 +51,18 @@ func mkEnumOgenSchema(ed protoreflect.EnumDescriptor) *ogen.Schema {
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
-	s := ogen.NewSchema().SetType("object")
+	name := descriptorName(msg.Desc)
+	if g.hasDescriptorName(name) {
+		return nil
+	}
+	g.setDescriptorName(name)
+
+	s := ogen.NewSchema()
+	{
+		g.spec.AddSchema(name, s)
+		g.messages[name] = msg
+	}
+	s.SetType("object")
 
 	if err := g.mkJSONFields(s, msg.Fields); err != nil {
 		return err
@@ -58,22 +73,13 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 			continue
 		}
 
-		if field.Message != nil {
-			name := descriptorName(field.Desc)
-			if g.hasDescriptorName(name) {
-				s.SetRef(descriptorRef(field.Message.Desc))
-
-				continue
-			}
-
-			g.setDescriptorName(name)
-
-			if err := g.mkSchema(field.Message); err != nil {
+		if fmsg := field.Message; fmsg != nil {
+			if err := g.mkSchema(fmsg); err != nil {
 				return err
 			}
 		}
-		if field.Enum != nil {
-			g.mkEnum(field.Enum)
+		if enum := field.Enum; enum != nil {
+			g.mkEnum(enum)
 		}
 	}
 
@@ -87,8 +93,6 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 		g.mkEnum(e)
 	}
 
-	name := descriptorName(msg.Desc)
-	g.spec.AddSchema(name, s)
 	return nil
 }
 

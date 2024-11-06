@@ -1,0 +1,265 @@
+openapi: 3.1.0
+info:
+  title: ""
+  version: ""
+paths:
+  /echo:
+    post:
+      operationId: echo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: proxypb.APIService.Echo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StringMessage'
+  /pathParam/{value}:
+    post:
+      operationId: pathParam
+      parameters:
+        - name: value
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: proxypb.APIService.PathParam response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StringMessage'
+  /testModel:
+    post:
+      operationId: testModelEndpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestModel'
+        required: true
+      responses:
+        "200":
+          description: proxypb.APIService.TestModelEndpoint response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestModel'
+components:
+  schemas:
+    ChildModel1:
+      type: object
+      properties:
+        childB1:
+          type: boolean
+        childStr1:
+          type: string
+    ChildModel3:
+      type: object
+      properties:
+        subKey:
+          type: string
+        bool1:
+          type: boolean
+        i32:
+          type: integer
+          format: int32
+        optStr:
+          type: string
+        optBool:
+          type: boolean
+        optI32:
+          type: integer
+          format: int32
+    StringMessage:
+      type: object
+      properties:
+        value:
+          type: string
+    TestEnum:
+      type: string
+      enum:
+        - "DEVICE_UNKNOWN"
+        - "DEVICE_KEYBOARD"
+        - "DEVICE_MOUSE"
+        - "DEVICE_MONITOR"
+    TestModel:
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int32
+        valueArray:
+          type: array
+          items:
+            description: _UPB_MODE_ARRAY
+            type: integer
+            format: int32
+        valueDeprec:
+          type: array
+          items:
+            type: integer
+            format: int32
+            deprecated: true
+        str1:
+          type: string
+        b1:
+          type: boolean
+        b2:
+          type: boolean
+        str2:
+          type: string
+        str3:
+          type: string
+        optionalFloat:
+          type: number
+          format: float
+        optionalDouble:
+          type: number
+          format: double
+        optionalInt64:
+          type: integer
+          format: int64
+        optionalUint32:
+          type: integer
+          format: uint32
+        optionalUint64:
+          type: integer
+          format: uint64
+        optionalSint32:
+          type: integer
+          format: int32
+        optionalSint64:
+          type: integer
+          format: int64
+        optionalFixed32:
+          type: integer
+          format: uint32
+        optionalFixed64:
+          type: integer
+          format: uint64
+        optionalSfixed32:
+          type: integer
+          format: int32
+        optionalSfixed64:
+          type: integer
+          format: int64
+        repeatedInt64:
+          type: array
+          items:
+            type: integer
+            format: int64
+        repeatedUint64:
+          type: array
+          items:
+            type: integer
+            format: uint64
+        repeatedFixed64:
+          type: array
+          items:
+            type: integer
+            format: uint64
+        repeatedSfixed64:
+          type: array
+          items:
+            type: integer
+            format: int64
+        repeatedBool:
+          type: array
+          items:
+            type: boolean
+        repeatedString:
+          type: array
+          items:
+            type: string
+        nestedChild1:
+          $ref: '#/components/schemas/TestModel.NestedChild'
+        childModel1:
+          $ref: '#/components/schemas/ChildModel1'
+        childModel2:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildModel1'
+        bar:
+          $ref: '#/components/schemas/ChildModel1'
+        oneofMember1:
+          type: string
+        oneofMember2:
+          type: boolean
+        recursiveChild:
+          $ref: '#/components/schemas/TestModel'
+        childStrMap:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ChildModel1'
+        strToIntMap:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        strToStrMap:
+          type: object
+          additionalProperties:
+            type: string
+        category:
+          $ref: '#/components/schemas/TestModel.Category'
+        string:
+          type: string
+        int64:
+          type: integer
+          format: int64
+        double:
+          type: number
+          format: double
+        template:
+          type: string
+        msg:
+          type: string
+        arena:
+          type: string
+        importedEnum:
+          $ref: '#/components/schemas/TestEnum'
+        phase:
+          type: string
+        clearPhase:
+          type: boolean
+    TestModel.Category:
+      type: string
+      enum:
+        - "UNKNOWN"
+        - "IMAGES"
+        - "NEWS"
+        - "VIDEO"
+        - "RADIO"
+    TestModel.ChildStrMapEntry:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          $ref: '#/components/schemas/ChildModel1'
+    TestModel.NestedChild:
+      type: object
+      properties:
+        nestedChildName:
+          type: string
+    TestModel.StrToIntMapEntry:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: integer
+          format: int32
+    TestModel.StrToStrMapEntry:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
