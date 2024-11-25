@@ -7,7 +7,7 @@ require (
 	github.com/go-faster/sdk v0.15.1
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v1.6.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda
 	google.golang.org/protobuf v1.35.2
