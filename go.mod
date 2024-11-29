@@ -1,15 +1,16 @@
 module github.com/ogen-go/protoc-gen-oas
 
 go 1.22.0
+toolchain go1.22.9
 
 require (
 	github.com/go-faster/errors v0.7.1
-	github.com/go-faster/sdk v0.15.1
+	github.com/go-faster/sdk v0.15.2
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v1.7.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda
+	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
 	google.golang.org/protobuf v1.35.2
 )
 
