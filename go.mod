@@ -6,7 +6,7 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/sdk v0.15.2
 	github.com/go-faster/yaml v0.4.6
-	github.com/ogen-go/ogen v1.8.0
+	github.com/ogen-go/ogen v1.8.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
