@@ -6,10 +6,10 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/sdk v0.20.0
 	github.com/go-faster/yaml v0.4.6
-	github.com/ogen-go/ogen v1.8.1
+	github.com/ogen-go/ogen v1.9.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/genproto/googleapis/api v0.0.0-20241209162323-e6fa225c2576
+	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
+	google.golang.org/genproto/googleapis/api v0.0.0-20250127172529-29210b9bc287
 	google.golang.org/protobuf v1.36.4
 )
 
@@ -19,7 +19,6 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/jx v1.1.0 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
