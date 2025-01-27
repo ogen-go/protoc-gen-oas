@@ -4,12 +4,12 @@ go 1.22.7
 
 require (
 	github.com/go-faster/errors v0.7.1
-	github.com/go-faster/sdk v0.18.0
+	github.com/go-faster/sdk v0.20.0
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v1.8.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/genproto/googleapis/api v0.0.0-20241209162323-e6fa225c2576
+	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f
 	google.golang.org/protobuf v1.36.3
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
