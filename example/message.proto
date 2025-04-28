@@ -4,6 +4,7 @@ package service.v1;
 
 import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
+import "google/api/visibility.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "service/v1;service";
@@ -20,6 +21,7 @@ message Item {
   ItemType type = 2 [(google.api.field_behavior) = REQUIRED];
   string name = 3 [(google.api.field_behavior) = REQUIRED];
   google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED]; // Datetime when item was created.
+  string internal_field = 5 [(google.api.field_visibility).restriction = "INTERNAL"];
 }
 
 message GetItemsRequest {
