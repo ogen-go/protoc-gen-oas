@@ -11,7 +11,7 @@ require (
 	github.com/ogen-go/ogen v1.12.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
-	google.golang.org/genproto/googleapis/api v0.0.0-20250127172529-29210b9bc287
+	google.golang.org/genproto/googleapis/api v0.0.0-20250428153025-10db94c68c34
 	google.golang.org/protobuf v1.36.6
 )
 

@@ -94,6 +94,11 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 
 func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error {
 	for _, f := range fields {
+		isInternal := isInternalField(f.Desc.Options()) && !isPreviewField(f.Desc.Options())
+		if isInternal {
+			continue
+		}
+
 		propSchema, err := g.mkFieldSchema(f.Desc, f.Comments.Trailing.String())
 		if err != nil {
 			return errors.Wrapf(err, "make field %q", f.Desc.FullName())
