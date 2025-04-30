@@ -329,6 +329,12 @@ func (g *Generator) mkQueryParameters(op *ogen.Operation, fields map[string]*pro
 	walkFields = func(prefix string, fields []*protogen.Field) error {
 		for _, f := range fields {
 			fd := f.Desc
+
+			isInternal := isInternalField(fd.Options()) && !isPreviewField(fd.Options())
+			if isInternal {
+				continue
+			}
+
 			name := prefix + fd.JSONName()
 
 			switch kind := fd.Kind(); kind {
