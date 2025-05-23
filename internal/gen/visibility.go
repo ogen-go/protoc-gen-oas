@@ -18,7 +18,19 @@ func isPreviewField(opts protoreflect.ProtoMessage) bool {
 }
 
 func isFieldVisibilityIndicator(opts protoreflect.ProtoMessage, restriction string) bool {
-	fieldInfo, ok := proto.GetExtension(opts, visibility.E_FieldVisibility).(*visibility.VisibilityRule)
+	return isVisibilityIndicator(opts, visibility.E_FieldVisibility, restriction)
+}
+
+func isInternalMessage(opts protoreflect.ProtoMessage) bool {
+	return isMessageVisibilityIndicator(opts, "INTERNAL")
+}
+
+func isMessageVisibilityIndicator(opts protoreflect.ProtoMessage, restriction string) bool {
+	return isVisibilityIndicator(opts, visibility.E_MessageVisibility, restriction)
+}
+
+func isVisibilityIndicator(opts protoreflect.ProtoMessage, ext protoreflect.ExtensionType, restriction string) bool {
+	fieldInfo, ok := proto.GetExtension(opts, ext).(*visibility.VisibilityRule)
 	if !ok || fieldInfo == nil {
 		return false
 	}

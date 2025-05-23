@@ -224,6 +224,10 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 			if err := g.mkJSONFields(s, values); err != nil {
 				return "", errors.Wrap(err, "make requestBody schema")
 			}
+
+			if len(s.Properties) == 0 {
+				s = nil
+			}
 		}
 	case body != "":
 		// TODO(tdakkota): generate a requestBody component.
@@ -244,6 +248,12 @@ func (g *Generator) mkInput(rule HTTPRule, m *protogen.Method, op *ogen.Operatio
 		delete(fields, body)
 		fallthrough
 	default:
+		for k, field := range fields {
+			isInternalMessage := field.Message != nil && isInternalMessage(field.Message.Desc.Options())
+			if isInternalMessage {
+				delete(fields, k)
+			}
+		}
 		// Remaining fields are query parameters.
 		if err := g.mkQueryParameters(op, fields); err != nil {
 			return "", err

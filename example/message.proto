@@ -50,6 +50,7 @@ message GetItemRequest {
     (google.api.field_behavior) = REQUIRED,
     (google.api.field_info).format = UUID4
   ];
+  InternalMessage internal_message = 2;
 }
 
 message UpdateItemRequest {
@@ -66,6 +67,7 @@ message PatchItemRequest {
 
 message DeleteItemRequest {
   string id = 1 [(google.api.field_behavior) = REQUIRED];
+  InternalMessage internal_message = 2;
 }
 
 enum ItemType {
@@ -78,4 +80,11 @@ message NestedEnum {
     ITEM_TYPE_UNSPECIFIED = 0;
     ITEM_TYPE_BASIC = 1;
   }
+}
+
+message InternalMessage {
+  option (google.api.message_visibility).restriction = "INTERNAL";
+
+  string user_id = 1;
+  repeated string scopes = 2;
 }
