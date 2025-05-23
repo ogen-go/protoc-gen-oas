@@ -47,6 +47,10 @@ func mkEnumOgenSchema(ed protoreflect.EnumDescriptor) *ogen.Schema {
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
+	if isInternalMessage(msg.Desc.Options()) {
+		return nil
+	}
+
 	s := ogen.NewSchema().SetType("object")
 
 	if err := g.mkJSONFields(s, msg.Fields); err != nil {
@@ -94,8 +98,9 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 
 func (g *Generator) mkJSONFields(s *ogen.Schema, fields []*protogen.Field) error {
 	for _, f := range fields {
-		isInternal := isInternalField(f.Desc.Options()) && !isPreviewField(f.Desc.Options())
-		if isInternal {
+		isInternalField := isInternalField(f.Desc.Options()) && !isPreviewField(f.Desc.Options())
+		isInternalMessage := f.Message != nil && isInternalMessage(f.Message.Desc.Options())
+		if isInternalField || isInternalMessage {
 			continue
 		}
 
