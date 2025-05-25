@@ -199,6 +199,30 @@ components:
           description: Datetime when item was created.
           type: string
           format: date-time
+        mapWithStringKey:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithInt32Key:
+          type: object
+          additionalProperties:
+            type: string
+            format: int32
+        mapWithInt64Key:
+          type: object
+          additionalProperties:
+            type: string
+            format: int64
+        mapWithUint32Key:
+          type: object
+          additionalProperties:
+            type: string
+            format: uint32
+        mapWithUint64Key:
+          type: object
+          additionalProperties:
+            type: string
+            format: uint64
       required:
         - id
         - type

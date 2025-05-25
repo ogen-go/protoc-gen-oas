@@ -47,6 +47,10 @@ func mkEnumOgenSchema(ed protoreflect.EnumDescriptor) *ogen.Schema {
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
+	if msg.Desc.IsMapEntry() {
+		return nil
+	}
+
 	s := ogen.NewSchema().SetType("object")
 
 	if err := g.mkJSONFields(s, msg.Fields); err != nil {
@@ -54,7 +58,7 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 	}
 
 	for _, field := range msg.Fields {
-		if field.Desc.HasPresence() {
+		if field.Desc.HasPresence() || field.Desc.IsMap() {
 			continue
 		}
 
@@ -186,20 +190,16 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 			return wkt, nil
 		default:
 			if fd.IsMap() {
-				if keyKind := fd.MapKey().Kind(); keyKind != protoreflect.StringKind {
+				keyKind := fd.MapKey().Kind()
+				if isUnsupportedMapKeyKind(keyKind) {
 					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
 				}
 
-				elem, err := g.mkFieldSchema(fd.MapValue(), "")
-				if err != nil {
-					return nil, errors.Wrap(err, "make map key")
-				}
 				s = ogen.NewSchema().
 					SetType("object")
 				s.AdditionalProperties = &ogen.AdditionalProperties{
-					Schema: *elem,
+					Schema: mkMapSchema(keyKind),
 				}
-				s.SetDescription(mkDescription(description))
 				return s, nil
 			}
 
@@ -322,4 +322,39 @@ func setFieldFormat(s *ogen.Schema, opts protoreflect.ProtoMessage) {
 	case isFieldIPFormat(opts):
 		s.SetFormat("ip")
 	}
+}
+
+func isUnsupportedMapKeyKind(keyKind protoreflect.Kind) bool {
+	switch keyKind {
+	case protoreflect.StringKind, protoreflect.Int32Kind, protoreflect.Int64Kind, protoreflect.Uint32Kind, protoreflect.Uint64Kind:
+		return false
+	default:
+		return true
+	}
+}
+
+func mkMapSchema(keyKind protoreflect.Kind) ogen.Schema {
+	s := ogen.Schema{}
+	s = *s.SetType("string")
+	switch keyKind {
+	case protoreflect.StringKind:
+		// skip
+
+	case protoreflect.Int32Kind:
+		s = *s.SetFormat("int32")
+
+	case protoreflect.Int64Kind:
+		s = *s.SetFormat("int64")
+
+	case protoreflect.Uint32Kind:
+		s = *s.SetFormat("uint32")
+
+	case protoreflect.Uint64Kind:
+		s = *s.SetFormat("uint64")
+
+	default:
+		// skip
+	}
+
+	return s
 }
