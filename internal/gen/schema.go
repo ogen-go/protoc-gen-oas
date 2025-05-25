@@ -190,15 +190,14 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 			return wkt, nil
 		default:
 			if fd.IsMap() {
-				keyKind := fd.MapKey().Kind()
-				if isUnsupportedMapKeyKind(keyKind) {
+				if keyKind := fd.MapKey().Kind(); isUnsupportedMapKeyKind(keyKind) {
 					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
 				}
 
 				s = ogen.NewSchema().
 					SetType("object")
 				s.AdditionalProperties = &ogen.AdditionalProperties{
-					Schema: mkMapSchema(keyKind),
+					Schema: mkMapSchema(fd.MapValue().Kind()),
 				}
 				return s, nil
 			}
