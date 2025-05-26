@@ -217,12 +217,12 @@ components:
           type: object
           additionalProperties:
             type: integer
-            format: int64
+            format: uint32
         mapWithUint64:
           type: object
           additionalProperties:
             type: integer
-            format: int64
+            format: uint64
         mapWithInt32Key:
           type: object
           additionalProperties:
@@ -253,12 +253,12 @@ components:
           type: object
           additionalProperties:
             type: integer
-            format: int64
+            format: uint32
         mapWithUint64Value:
           type: object
           additionalProperties:
             type: integer
-            format: int64
+            format: uint64
         mapWithMessageValue:
           type: object
           additionalProperties:
