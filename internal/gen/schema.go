@@ -194,10 +194,15 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
 				}
 
+				elem, err := g.mkFieldSchema(fd.MapValue(), "")
+				if err != nil {
+					return nil, errors.Wrap(err, "make map key")
+				}
+
 				s = ogen.NewSchema().
 					SetType("object")
 				s.AdditionalProperties = &ogen.AdditionalProperties{
-					Schema: mkMapSchema(fd.MapValue().Kind()),
+					Schema: *elem,
 				}
 				return s, nil
 			}
@@ -330,30 +335,4 @@ func isUnsupportedMapKeyKind(keyKind protoreflect.Kind) bool {
 	default:
 		return true
 	}
-}
-
-func mkMapSchema(keyKind protoreflect.Kind) ogen.Schema {
-	s := ogen.Schema{}
-	s = *s.SetType("string")
-	switch keyKind {
-	case protoreflect.StringKind:
-		// skip
-
-	case protoreflect.Int32Kind:
-		s = *s.SetFormat("int32")
-
-	case protoreflect.Int64Kind:
-		s = *s.SetFormat("int64")
-
-	case protoreflect.Uint32Kind:
-		s = *s.SetFormat("uint32")
-
-	case protoreflect.Uint64Kind:
-		s = *s.SetFormat("uint64")
-
-	default:
-		// skip
-	}
-
-	return s
 }
