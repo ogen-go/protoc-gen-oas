@@ -89,6 +89,10 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 				continue
 			}
 
+			if !g.hasDescriptorName(name) {
+				continue
+			}
+
 			if err := g.mkSchema(m); err != nil {
 				return nil, err
 			}

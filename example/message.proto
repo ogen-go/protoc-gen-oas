@@ -106,3 +106,5 @@ message InternalMessage {
 message MapValue {
   string value = 1;
 }
+
+message UnusedMessage {}
