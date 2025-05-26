@@ -22,6 +22,20 @@ message Item {
   string name = 3 [(google.api.field_behavior) = REQUIRED];
   google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = REQUIRED]; // Datetime when item was created.
   string internal_field = 5 [(google.api.field_visibility).restriction = "INTERNAL"];
+  map<string, string> map_with_string = 6;
+  map<int32, int32> map_with_int32 = 7;
+  map<int64, int64> map_with_int64 = 8;
+  map<uint32, uint32> map_with_uint32 = 9;
+  map<uint64, uint64> map_with_uint64 = 10;
+  map<int32, string> map_with_int32_key = 11;
+  map<int64, string> map_with_int64_key = 12;
+  map<uint32, string> map_with_uint32_key = 13;
+  map<uint64, string> map_with_uint64_key = 14;
+  map<string, int32> map_with_int32_value = 15;
+  map<string, int64> map_with_int64_value = 16;
+  map<string, uint32> map_with_uint32_value = 17;
+  map<string, uint64> map_with_uint64_value = 18;
+  map<string, MapValue> map_with_message_value = 19;
 }
 
 message GetItemsRequest {
@@ -78,4 +92,8 @@ message NestedEnum {
     ITEM_TYPE_UNSPECIFIED = 0;
     ITEM_TYPE_BASIC = 1;
   }
+}
+
+message MapValue {
+  string value = 1;
 }
