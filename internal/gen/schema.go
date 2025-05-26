@@ -143,18 +143,14 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 		protoreflect.Sfixed32Kind:
 		return ogen.NewSchema().SetType("integer").SetFormat("int32").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
 
-	case protoreflect.Uint32Kind,
-		protoreflect.Fixed32Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint32").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
-
 	case protoreflect.Int64Kind,
 		protoreflect.Sint64Kind,
-		protoreflect.Sfixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
-
-	case protoreflect.Uint64Kind,
+		protoreflect.Sfixed64Kind,
+		protoreflect.Uint32Kind,
+		protoreflect.Fixed32Kind,
+		protoreflect.Uint64Kind,
 		protoreflect.Fixed64Kind:
-		return ogen.NewSchema().SetType("integer").SetFormat("uint64").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
+		return ogen.NewSchema().SetType("integer").SetFormat("int64").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
 
 	case protoreflect.FloatKind:
 		return ogen.NewSchema().SetType("number").SetFormat("float").SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description)), nil
