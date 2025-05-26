@@ -278,8 +278,6 @@ components:
       properties:
         value:
           type: string
-    NestedEnum:
-      type: object
     NestedEnum.ItemType:
       type: string
       enum:
