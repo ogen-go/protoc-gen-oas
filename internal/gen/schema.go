@@ -47,6 +47,9 @@ func mkEnumOgenSchema(ed protoreflect.EnumDescriptor) *ogen.Schema {
 }
 
 func (g *Generator) mkSchema(msg *protogen.Message) error {
+	name := descriptorName(msg.Desc)
+	g.setRef(name)
+
 	if msg.Desc.IsMapEntry() || isInternalMessage(msg.Desc.Options()) {
 		return nil
 	}
@@ -91,7 +94,6 @@ func (g *Generator) mkSchema(msg *protogen.Message) error {
 		g.mkEnum(e)
 	}
 
-	name := descriptorName(msg.Desc)
 	g.spec.AddSchema(name, s)
 	return nil
 }
@@ -180,6 +182,9 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 	case protoreflect.MessageKind:
 		msg := fd.Message()
 
+		name := descriptorName(msg)
+		g.setRef(name)
+
 		wkt, ok, err := g.mkWellKnownPrimitive(msg)
 		switch {
 		case err != nil:
@@ -205,7 +210,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 				} else {
 					msg = fd.MapValue().Message()
 					name := descriptorName(msg)
-					g.setDescriptorName(name)
+					g.setRef(name)
 					elem = ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description))
 				}
 

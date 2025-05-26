@@ -147,6 +147,16 @@ components:
         - name
     Empty:
       type: object
+    Error:
+      type: object
+      properties:
+        service:
+          type: string
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     GetItemsResponse:
       type: object
       properties:
@@ -161,6 +171,8 @@ components:
           $ref: '#/components/schemas/GetItemsResponse.NestedItem'
         nestedType:
           $ref: '#/components/schemas/NestedEnum.ItemType'
+        error:
+          $ref: '#/components/schemas/Error'
       required:
         - items
         - totalCount

@@ -89,7 +89,7 @@ func NewGenerator(files []*protogen.File, opts ...GeneratorOption) (*Generator, 
 				continue
 			}
 
-			if !g.hasDescriptorName(name) {
+			if !g.hasRef(name) {
 				continue
 			}
 
@@ -108,6 +108,7 @@ type Generator struct {
 	indent          int
 	requests        map[string]struct{}
 	descriptorNames map[string]struct{}
+	refs            map[string]struct{}
 }
 
 // YAML returns OpenAPI specification bytes.
@@ -134,6 +135,7 @@ func (g *Generator) init() {
 	g.spec.Init()
 	g.requests = make(map[string]struct{})
 	g.descriptorNames = make(map[string]struct{})
+	g.refs = make(map[string]struct{})
 }
 
 func (g *Generator) mkMethod(rule HTTPRule, m *protogen.Method, deprecated bool) (string, *ogen.Operation, error) {
@@ -456,6 +458,19 @@ func (g *Generator) setDescriptorName(s string) {
 
 func (g *Generator) hasDescriptorName(s string) bool {
 	_, ok := g.descriptorNames[s]
+	return ok
+}
+
+func (g *Generator) setRef(r string) {
+	if g.hasRef(r) {
+		return
+	}
+
+	g.refs[r] = struct{}{}
+}
+
+func (g *Generator) hasRef(r string) bool {
+	_, ok := g.refs[r]
 	return ok
 }
 

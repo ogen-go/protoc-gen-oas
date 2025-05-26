@@ -6,6 +6,7 @@ import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
 import "google/api/visibility.proto";
 import "google/protobuf/timestamp.proto";
+import "basic/v1/error.proto";
 
 option go_package = "service/v1;service";
 
@@ -57,6 +58,7 @@ message GetItemsResponse {
   int32 total_count = 2 [(google.api.field_behavior) = REQUIRED];
   NestedItem nested_item = 3;
   NestedEnum.ItemType nested_type = 4;
+  basic.v1.Error error = 5;
 }
 
 message GetItemRequest {
