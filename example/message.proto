@@ -35,6 +35,7 @@ message Item {
   map<string, int64> map_with_int64_value = 16;
   map<string, uint32> map_with_uint32_value = 17;
   map<string, uint64> map_with_uint64_value = 18;
+  map<string, MapValue> map_with_message_value = 19;
 }
 
 message GetItemsRequest {
@@ -91,4 +92,8 @@ message NestedEnum {
     ITEM_TYPE_UNSPECIFIED = 0;
     ITEM_TYPE_BASIC = 1;
   }
+}
+
+message MapValue {
+  string value = 1;
 }

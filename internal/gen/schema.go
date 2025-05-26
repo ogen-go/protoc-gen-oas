@@ -194,9 +194,17 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 					return nil, errors.Errorf("unsupported map key kind: %s", keyKind)
 				}
 
-				elem, err := g.mkFieldSchema(fd.MapValue(), "")
-				if err != nil {
-					return nil, errors.Wrap(err, "make map key")
+				var elem *ogen.Schema
+
+				if fd.MapValue().Kind() != protoreflect.MessageKind {
+					elem, err = g.mkFieldSchema(fd.MapValue(), "")
+					if err != nil {
+						return nil, errors.Wrap(err, "make map key")
+					}
+
+					elem.SetType("string") // key must be string.
+				} else {
+					elem = ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description))
 				}
 
 				s = ogen.NewSchema().
