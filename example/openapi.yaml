@@ -199,6 +199,70 @@ components:
           description: Datetime when item was created.
           type: string
           format: date-time
+        mapWithString:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithInt32:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        mapWithInt64:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        mapWithUint32:
+          type: object
+          additionalProperties:
+            type: integer
+            format: uint32
+        mapWithUint64:
+          type: object
+          additionalProperties:
+            type: integer
+            format: uint64
+        mapWithInt32Key:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithInt64Key:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithUint32Key:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithUint64Key:
+          type: object
+          additionalProperties:
+            type: string
+        mapWithInt32Value:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        mapWithInt64Value:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        mapWithUint32Value:
+          type: object
+          additionalProperties:
+            type: integer
+            format: uint32
+        mapWithUint64Value:
+          type: object
+          additionalProperties:
+            type: integer
+            format: uint64
+        mapWithMessageValue:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MapValue'
       required:
         - id
         - type
@@ -209,6 +273,11 @@ components:
       enum:
         - ITEM_TYPE_UNSPECIFIED
         - ITEM_TYPE_BASIC
+    MapValue:
+      type: object
+      properties:
+        value:
+          type: string
     NestedEnum:
       type: object
     NestedEnum.ItemType:
