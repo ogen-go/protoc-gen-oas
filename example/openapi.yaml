@@ -262,7 +262,7 @@ components:
         mapWithMessageValue:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/Item.MapWithMessageValueEntry'
+            $ref: '#/components/schemas/MapValue'
       required:
         - id
         - type

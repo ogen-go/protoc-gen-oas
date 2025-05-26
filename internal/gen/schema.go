@@ -202,6 +202,7 @@ func (g *Generator) mkFieldSchema(fd protoreflect.FieldDescriptor, description s
 						return nil, errors.Wrap(err, "make map key")
 					}
 				} else {
+					msg = fd.MapValue().Message()
 					elem = ogen.NewSchema().SetRef(descriptorRef(msg)).SetDeprecated(isDeprecatedField(fd.Options())).SetDescription(mkDescription(description))
 				}
 
