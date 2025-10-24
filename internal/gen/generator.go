@@ -127,7 +127,16 @@ func (g *Generator) YAML() ([]byte, error) {
 
 // JSON returns OpenAPI specification bytes.
 func (g *Generator) JSON() ([]byte, error) {
-	return json.Marshal(g.spec)
+	var buf bytes.Buffer
+
+	enc := json.NewEncoder(&buf)
+	enc.SetIndent("", "  ")
+
+	if err := enc.Encode(g.spec); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 func (g *Generator) init() {

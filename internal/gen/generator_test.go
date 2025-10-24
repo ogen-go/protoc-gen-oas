@@ -1,6 +1,8 @@
 package gen
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -62,7 +64,11 @@ func TestNewGenerator(t *testing.T) {
 			yaml, err := g.YAML()
 			require.NoError(t, err)
 
-			json, err := g.JSON()
+			jsonBytes, err := g.JSON()
+			require.NoError(t, err)
+
+			var minifiedBuffer bytes.Buffer
+			err = json.Compact(&minifiedBuffer, jsonBytes)
 			require.NoError(t, err)
 
 			// Ensure spec is valid.
@@ -71,7 +77,7 @@ func TestNewGenerator(t *testing.T) {
 
 			// Run go test with -update flag to update golden files.
 			gold.Str(t, string(yaml), fmt.Sprintf("%s.yaml", fileName))
-			gold.Str(t, string(json), fmt.Sprintf("%s.json", fileName))
+			gold.Str(t, string(minifiedBuffer.Bytes()), fmt.Sprintf("%s.json", fileName))
 		})
 	}
 }

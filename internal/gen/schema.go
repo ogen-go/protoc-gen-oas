@@ -31,7 +31,8 @@ func enum(ed protoreflect.EnumDescriptor) []json.RawMessage {
 
 	for i := 0; i < values.Len(); i++ {
 		val := []byte(values.Get(i).Name())
-		enum = append(enum, val)
+		jsonVal, _ := json.Marshal(string(val))
+		enum = append(enum, jsonVal)
 	}
 
 	return enum
