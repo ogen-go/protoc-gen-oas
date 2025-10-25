@@ -77,7 +77,7 @@ func TestNewGenerator(t *testing.T) {
 
 			// Run go test with -update flag to update golden files.
 			gold.Str(t, string(yaml), fmt.Sprintf("%s.yaml", fileName))
-			gold.Str(t, string(minifiedBuffer.Bytes()), fmt.Sprintf("%s.json", fileName))
+			gold.Str(t, minifiedBuffer.String(), fmt.Sprintf("%s.json", fileName))
 		})
 	}
 }
