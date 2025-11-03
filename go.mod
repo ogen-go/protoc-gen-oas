@@ -4,12 +4,12 @@ go 1.24.0
 
 require (
 	github.com/go-faster/errors v0.7.1
-	github.com/go-faster/sdk v0.28.0
+	github.com/go-faster/sdk v0.29.1
 	github.com/go-faster/yaml v0.4.6
 	github.com/ogen-go/ogen v1.16.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
-	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822
+	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5
 	google.golang.org/protobuf v1.36.10
 )
 
