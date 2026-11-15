@@ -1,8 +1,12 @@
 fail_on_severity: 'low'
 allow_licenses:
   - 'MIT'
+  # github.com/segmentio/asm, pulled in by go-faster/jx.
+  - 'MIT-0'
   - 'ISC'
   - 'MPL-2.0'
   - 'BSD-2-Clause'
   - 'BSD-3-Clause'
   - 'Apache-2.0'
+  # golang.org/x/* modules: BSD-3-Clause plus the Go patent grant.
+  - 'LicenseRef-scancode-google-patent-license-golang'
